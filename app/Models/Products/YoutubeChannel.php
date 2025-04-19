@@ -21,10 +21,11 @@ class YoutubeChannel extends Model
         'price',
         'summary',
         'about_channel',
-        'allow_buyer_messages',
-        'is_private',
         'analytics_screenshot',
         'listing_images',
+        'allow_buyer_messages',
+        'is_private',
+        'is_verified',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class YoutubeChannel extends Model
         'listing_images' => 'array',
         'allow_buyer_messages' => 'boolean',
         'is_private' => 'boolean',
+        'is_verified' => 'boolean',
         'price' => 'decimal:2',
     ];
 }

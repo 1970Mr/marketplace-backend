@@ -27,10 +27,11 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->nullable();
             $table->text('summary')->nullable();
             $table->text('about_channel')->nullable();
-            $table->boolean('allow_buyer_messages')->default(true);
-            $table->boolean('is_private')->default(false);
             $table->string('analytics_screenshot')->nullable();
             $table->json('listing_images')->nullable();
+            $table->boolean('allow_buyer_messages')->default(true);
+            $table->boolean('is_private')->default(false);
+            $table->boolean('is_verified')->default(true);
             $table->timestamps();
         });
     }

@@ -32,6 +32,7 @@ class YoutubeChannelResource extends JsonResource
             'about_channel' => $this->about_channel,
             'allow_buyer_messages' => $this->allow_buyer_messages,
             'is_private' => $this->is_private,
+            'is_verified' => $this->is_verified,
             'analytics_screenshot_url' => $this->analytics_screenshot
                 ? asset('storage/' . $this->analytics_screenshot)
                 : null,

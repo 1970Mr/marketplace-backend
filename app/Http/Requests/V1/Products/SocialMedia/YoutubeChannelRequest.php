@@ -22,7 +22,6 @@ class YoutubeChannelRequest extends FormRequest
      */
     public function rules(): array
     {
-//        logger($this->all());
         return [
             'uuid' => ['required'],
             'user_id' => ['nullable'],
