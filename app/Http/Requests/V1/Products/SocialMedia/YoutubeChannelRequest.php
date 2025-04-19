@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V1\Products\SocialMedial;
+namespace App\Http\Requests\V1\Products\SocialMedia;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -39,6 +39,7 @@ class YoutubeChannelRequest extends FormRequest
             'about_channel' => ['nullable', 'string'],
             'allow_buyer_messages' => ['boolean'],
             'is_private' => ['boolean'],
+            'is_completed' => ['boolean'],
             'analytics_screenshot' => ['nullable', 'image', 'max:2048'],
             'listing_images' => ['nullable', 'array', 'max:3'],
             'listing_images.*' => ['image', 'max:2048'],

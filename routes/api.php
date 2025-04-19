@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
-use App\Http\Controllers\Api\V1\Products\SocialMedial\YoutubeChannelController;
+use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {

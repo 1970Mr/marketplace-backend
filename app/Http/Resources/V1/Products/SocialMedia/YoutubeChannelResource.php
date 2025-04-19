@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\V1\Products\SocialMedial;
+namespace App\Http\Resources\V1\Products\SocialMedia;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -33,6 +33,9 @@ class YoutubeChannelResource extends JsonResource
             'allow_buyer_messages' => $this->allow_buyer_messages,
             'is_private' => $this->is_private,
             'is_verified' => $this->is_verified,
+            'is_sold' => $this->is_sold,
+            'is_completed' => $this->is_completed,
+            'is_active' => $this->is_active,
             'analytics_screenshot_url' => $this->analytics_screenshot
                 ? asset('storage/' . $this->analytics_screenshot)
                 : null,
