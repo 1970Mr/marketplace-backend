@@ -128,6 +128,12 @@ class ProductController extends Controller
         $sortField = $request->input('sort_by', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
 
+        $allowedSortFields = ['created_at', 'price'];
+
+        if (!in_array($sortField, $allowedSortFields, true)) {
+            $sortField = 'created_at';
+        }
+
         $query->orderBy($sortField, $sortOrder);
     }
 
