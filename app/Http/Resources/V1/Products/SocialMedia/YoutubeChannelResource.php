@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1\Products\SocialMedia;
 
+use App\Models\Products\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,28 +15,20 @@ class YoutubeChannelResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $productData = $this->getProductData($this->whenLoaded('product'));
+
         return [
+            ...$productData,
+
+            // YouTube-specific
             'id' => $this->id,
-            'uuid' => $this->uuid,
-            'user_id' => $this->user_id,
             'url' => $this->url,
-            'category' => $this->category,
-            'sub_category' => $this->sub_category,
-            'business_location' => $this->business_location,
-            'age_of_channel' => $this->age_of_channel,
+            'business_locations' => $this->business_locations,
+            'channel_age' => $this->channel_age,
             'subscribers' => $this->subscribers,
             'monthly_revenue' => $this->monthly_revenue,
             'monthly_views' => $this->monthly_views,
             'monetization_method' => $this->monetization_method,
-            'price' => $this->price,
-            'summary' => $this->summary,
-            'about_channel' => $this->about_channel,
-            'allow_buyer_messages' => $this->allow_buyer_messages,
-            'is_private' => $this->is_private,
-            'is_verified' => $this->is_verified,
-            'is_sold' => $this->is_sold,
-            'is_completed' => $this->is_completed,
-            'is_active' => $this->is_active,
             'analytics_screenshot_url' => $this->analytics_screenshot
                 ? asset('storage/' . $this->analytics_screenshot)
                 : null,
@@ -44,6 +37,32 @@ class YoutubeChannelResource extends JsonResource
                 : [],
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+        ];
+    }
+
+    private function getProductData(?Product $product): array
+    {
+        if (!$product) {
+            return [];
+        }
+
+        return [
+            'uuid' => $product->uuid,
+            'title' => $product->title,
+            'summary' => $product->summary,
+            'about_business' => $product->about_business,
+            'price' => $product->price,
+            'type' => $product->type,
+            'sub_type' => $product->sub_type,
+            'industry' => $product->industry,
+            'sub_industry' => $product->sub_industry,
+            'allow_buyer_message' => $product->allow_buyer_message,
+            'is_private' => $product->is_private,
+            'is_verified' => $product->is_verified,
+            'is_sold' => $product->is_sold,
+            'is_completed' => $product->is_completed,
+            'is_sponsored' => $product->is_sponsored,
+            'is_active' => $product->is_active,
         ];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Products\ProductController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,4 +14,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/youtube-channel', [YoutubeChannelController::class, 'store'])->middleware('auth:sanctum');
 //    Route::post('/tiktok-channel/step-1', [TiktokChannelController::class, 'step1']);
 //    Route::post('/instagram-channel/step-1', [InstagramChannelController::class, 'step1']);
+
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{uuid}', [ProductController::class, 'index']);
 });

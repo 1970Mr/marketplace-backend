@@ -13,28 +13,15 @@ return new class extends Migration
     {
         Schema::create('youtube_channels', static function (Blueprint $table) {
             $table->id();
-            $table->uuid();
-            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('url')->nullable();
-            $table->string('category')->nullable();
-            $table->string('sub_category')->nullable();
-            $table->json('business_location')->nullable();
-            $table->string('age_of_channel')->nullable()->comment('Based on the month');
+            $table->json('business_locations')->nullable();
+            $table->string('channel_age')->nullable()->comment('Based on the month');
             $table->bigInteger('subscribers')->nullable();
             $table->decimal('monthly_revenue', 10, 2)->nullable();
             $table->bigInteger('monthly_views')->nullable();
             $table->string('monetization_method')->nullable();
-            $table->decimal('price', 10, 2)->nullable();
-            $table->text('summary')->nullable();
-            $table->text('about_channel')->nullable();
             $table->string('analytics_screenshot')->nullable();
             $table->json('listing_images')->nullable();
-            $table->boolean('allow_buyer_messages')->default(true);
-            $table->boolean('is_private')->default(false);
-            $table->boolean('is_verified')->default(true);
-            $table->boolean('is_sold')->default(false);
-            $table->boolean('is_completed')->default(false);
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

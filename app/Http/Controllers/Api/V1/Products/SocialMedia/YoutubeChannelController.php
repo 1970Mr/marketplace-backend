@@ -15,7 +15,7 @@ class YoutubeChannelController extends Controller
 
     public function store(YoutubeChannelRequest $request): YoutubeChannelResource
     {
-        $channel = $this->service->storeOrUpdate($request->validated());
-        return new YoutubeChannelResource($channel->fresh());
+        $youtubeChannel = $this->service->storeOrUpdate($request->validated());
+        return new YoutubeChannelResource($youtubeChannel);
     }
 }
