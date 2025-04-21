@@ -2,6 +2,10 @@
 
 namespace App\Http\Resources\V1\Products;
 
+use App\Http\Resources\V1\Products\SocialMedia\SecondYoutubeChannelResource;
+use App\Http\Resources\V1\Products\SocialMedia\YoutubeChannelResource;
+use App\Models\InstagramAccount;
+use App\Models\Products\YoutubeChannel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,7 +18,7 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $base = [
             'uuid' => $this->uuid,
             'title' => $this->title,
             'summary' => $this->summary,
@@ -31,7 +35,25 @@ class ProductResource extends JsonResource
             'is_completed' => $this->is_completed,
             'is_sponsored' => $this->is_sponsored,
             'is_active' => $this->is_active,
-            'productable' => $this->whenLoaded('productable'),
         ];
+
+        if ($this->relationLoaded('productable')) {
+            $base['details'] = $this->getProductableResource();
+        }
+
+        return $base;
+    }
+
+    private function getProductableResource()
+    {
+        $productable = $this->productable;
+
+        return match (true) {
+            $productable instanceof YoutubeChannel =>
+            SecondYoutubeChannelResource::make($productable),
+            $productable instanceof InstagramAccount =>
+            YoutubeChannelResource::make($productable),
+            default => null,
+        };
     }
 }
