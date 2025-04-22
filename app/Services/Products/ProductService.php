@@ -20,7 +20,7 @@ class ProductService
         return $query->paginate($request->input('per_page', 10));
     }
 
-    public function applySearch(Builder $query, Request $request): void
+    private function applySearch(Builder $query, Request $request): void
     {
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
@@ -31,7 +31,7 @@ class ProductService
         }
     }
 
-    public function applyFilters(Builder $query, Request $request): void
+    private function applyFilters(Builder $query, Request $request): void
     {
         $this->applyCoreFilters($query, $request);
         $this->applyYoutubeFilters($query, $request);
@@ -138,7 +138,7 @@ class ProductService
         });
     }
 
-    public function applySorting(Builder $query, Request $request): void
+    private function applySorting(Builder $query, Request $request): void
     {
         $sortField = $this->validateSortField($request->input('sort_by', 'created_at'));
         $sortOrder = $request->input('sort_order', 'desc');

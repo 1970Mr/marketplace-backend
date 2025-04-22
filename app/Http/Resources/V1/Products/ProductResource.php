@@ -4,6 +4,7 @@ namespace App\Http\Resources\V1\Products;
 
 use App\Http\Resources\V1\Products\SocialMedia\SecondYoutubeChannelResource;
 use App\Http\Resources\V1\Products\SocialMedia\YoutubeChannelResource;
+use App\Http\Resources\V1\User\UserResource;
 use App\Models\InstagramAccount;
 use App\Models\Products\YoutubeChannel;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ class ProductResource extends JsonResource
             'is_completed' => $this->is_completed,
             'is_sponsored' => $this->is_sponsored,
             'is_active' => $this->is_active,
+            'user' => UserResource::make($this->whenLoaded('user')),
         ];
 
         if ($this->relationLoaded('productable')) {

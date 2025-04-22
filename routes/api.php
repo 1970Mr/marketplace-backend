@@ -16,5 +16,5 @@ Route::prefix('v1')->group(function () {
 //    Route::post('/instagram-channel/step-1', [InstagramChannelController::class, 'step1']);
 
     Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{uuid}', [ProductController::class, 'index']);
+    Route::get('/products/{product:uuid}', [ProductController::class, 'show']);
 });

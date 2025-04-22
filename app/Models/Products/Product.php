@@ -2,8 +2,10 @@
 
 namespace App\Models\Products;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Product extends Model
@@ -42,6 +44,11 @@ class Product extends Model
     public function productable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function scopePublished(Builder $query): Builder
