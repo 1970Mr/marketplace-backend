@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources\V1\Products\SocialMedia;
 
-use App\Models\Products\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SecondYoutubeChannelResource extends JsonResource
+class SecondInstagramAccountResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +15,7 @@ class SecondYoutubeChannelResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'subscribers_count' => $this->subscribers_count,
-            'monthly_revenue' => $this->monthly_revenue,
+            'followers_count' => $this->followers_count,
             'business_age' => $this->business_age,
             'business_location' => $this->business_locations[0],
             'featured_image' => $this->getFeaturedImage(),

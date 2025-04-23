@@ -20,8 +20,8 @@ class YoutubeChannelService
     private function getYoutubeData(array $data): array
     {
         $youtubeData = collect($data)->only([
-            'url', 'business_locations', 'channel_age',
-            'subscribers', 'monthly_revenue', 'monthly_views',
+            'url', 'business_locations', 'business_age',
+            'subscribers_count', 'monthly_revenue', 'monthly_views',
             'monetization_method', 'analytics_screenshot', 'listing_images'
         ])->toArray();
 

@@ -7,7 +7,7 @@ use App\Enums\Products\SocialMediaType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
-class YoutubeChannelRequest extends FormRequest
+class InstagramAccountRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -43,14 +43,13 @@ class YoutubeChannelRequest extends FormRequest
             'is_sponsored' => ['boolean'],
             'is_active' => ['boolean'],
 
-            // YouTube-specific
+            // Instagram-specific
             'url' => ['nullable', 'url'],
             'business_locations' => ['nullable', 'array'],
-            'business_age' => ['nullable', 'integer'],
-            'subscribers_count' => ['nullable', 'integer'],
-            'monthly_revenue' => ['nullable', 'numeric'],
-            'monthly_views' => ['nullable', 'numeric'],
-            'monetization_method' => ['nullable', 'string'],
+            'business_age' => ['nullable', 'numeric'],
+            'followers_count' => ['nullable', 'integer'],
+            'posts_count' => ['nullable', 'integer'],
+            'average_likes' => ['nullable', 'numeric'],
             'analytics_screenshot' => ['nullable', 'image', 'max:2048'],
             'listing_images' => ['nullable', 'array', 'max:3'],
             'listing_images.*' => ['image', 'max:2048'],
@@ -64,7 +63,7 @@ class YoutubeChannelRequest extends FormRequest
             'user_id' => auth()->id(),
             'title' => $this->get('url'),
             'type' => ProductType::SOCIAL_MEDIA_ACCOUNT->value,
-            'sub_type' => SocialMediaType::YOUTUBE->value,
+            'sub_type' => SocialMediaType::INSTAGRAM->value,
         ]);
     }
 }

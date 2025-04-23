@@ -6,7 +6,7 @@ use App\Models\Products\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class YoutubeChannelResource extends JsonResource
+class InstagramAccountResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,15 +20,14 @@ class YoutubeChannelResource extends JsonResource
         return [
             ...$productData,
 
-            // YouTube-specific
+            // Instagram-specific
             'id' => $this->id,
             'url' => $this->url,
             'business_locations' => $this->business_locations,
             'business_age' => $this->business_age,
-            'subscribers_count' => $this->subscribers_count,
-            'monthly_revenue' => $this->monthly_revenue,
-            'monthly_views' => $this->monthly_views,
-            'monetization_method' => $this->monetization_method,
+            'followers_count' => $this->followers_count,
+            'posts_count' => $this->posts_count,
+            'average_likes' => $this->average_likes,
             'analytics_screenshot_url' => $this->analytics_screenshot
                 ? asset('storage/' . $this->analytics_screenshot)
                 : null,

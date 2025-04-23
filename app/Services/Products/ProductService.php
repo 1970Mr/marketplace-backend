@@ -126,7 +126,7 @@ class ProductService
         $query->when($request->has('business_age'), function ($q) use ($request) {
             $q->whereHas('productable', function (Builder $subQuery) use ($request) {
                 $businessAgeByMonth = $request->business_age * 12;
-                $subQuery->where('channel_age', '<=', $businessAgeByMonth);
+                $subQuery->where('business_age', '<=', $businessAgeByMonth);
             });
         });
     }

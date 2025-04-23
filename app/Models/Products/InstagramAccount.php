@@ -5,16 +5,15 @@ namespace App\Models\Products;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-class YoutubeChannel extends Model
+class InstagramAccount extends Model
 {
     protected $fillable = [
         'url',
         'business_locations',
         'business_age',
-        'subscribers_count',
-        'monthly_revenue',
-        'monthly_views',
-        'monetization_method',
+        'followers_count',
+        'posts_count',
+        'average_likes',
         'analytics_screenshot',
         'listing_images',
     ];
@@ -22,7 +21,6 @@ class YoutubeChannel extends Model
     protected $casts = [
         'business_locations' => 'array',
         'listing_images' => 'array',
-        'monthly_revenue' => 'decimal:2',
     ];
 
     public function product(): MorphOne
