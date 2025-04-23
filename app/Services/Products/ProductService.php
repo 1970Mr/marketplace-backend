@@ -3,21 +3,37 @@
 namespace App\Services\Products;
 
 use App\Models\Products\Product;
+use App\Services\Products\Filters\CoreFilter;
+use App\Services\Products\Filters\InstagramFilter;
+use App\Services\Products\Filters\YoutubeFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductService
 {
+    private array $platformFilters = [
+        CoreFilter::class,
+        YoutubeFilter::class,
+        InstagramFilter::class,
+    ];
+
     public function getFilteredProducts(Request $request): LengthAwarePaginator
     {
         $query = Product::published()->with('productable');
 
         $this->applySearch($query, $request);
-        $this->applyFilters($query, $request);
+        $this->applyAllFilters($query, $request);
         $this->applySorting($query, $request);
 
         return $query->paginate($request->input('per_page', 10));
+    }
+
+    private function applyAllFilters(Builder $query, Request $request): void
+    {
+        foreach ($this->platformFilters as $filterClass) {
+            app($filterClass)->apply($query, $request);
+        }
     }
 
     private function applySearch(Builder $query, Request $request): void
@@ -29,113 +45,6 @@ class ProductService
                     ->orWhere('about_business', 'LIKE', "%{$request->search}%");
             });
         }
-    }
-
-    private function applyFilters(Builder $query, Request $request): void
-    {
-        $this->applyCoreFilters($query, $request);
-        $this->applyYoutubeFilters($query, $request);
-        $this->applyInstagramFilters($query, $request);
-    }
-
-    private function applyCoreFilters(Builder $query, Request $request): void
-    {
-        $this->applyProductTypeFilter($query, $request);
-        $this->applyIndustryFilter($query, $request);
-        $this->applyPriceFilters($query, $request);
-    }
-
-    private function applyProductTypeFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->filled('product_types'), fn($q) => $q->whereIn('type', $request->product_types));
-    }
-
-    private function applyIndustryFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->filled('industries'), fn($q) => $q->whereIn('industry', $request->industries));
-    }
-
-    private function applyPriceFilters(Builder $query, Request $request): void
-    {
-        $query->when($request->has(['min_price', 'max_price']),
-            function ($q) use ($request) {
-                $q->whereBetween('price', [$request->min_price, $request->max_price]);
-            },
-            function ($q) use ($request) {
-                $this->applyMinPriceFilter($q, $request);
-                $this->applyMaxPriceFilter($q, $request);
-            }
-        );
-    }
-
-    private function applyMinPriceFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->has('min_price'), fn($q) => $q->where('price', '>=', $request->min_price));
-    }
-
-    private function applyMaxPriceFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->has('max_price'), fn($q) => $q->where('price', '<=', $request->max_price));
-    }
-
-    private function applyYoutubeFilters(Builder $query, Request $request): void
-    {
-        $this->applyRevenueFilters($query, $request);
-        $this->applyBusinessLocationFilter($query, $request);
-        $this->applyBusinessAgeFilter($query, $request);
-    }
-
-    private function applyRevenueFilters(Builder $query, Request $request): void
-    {
-        $query->when($request->has(['min_revenue', 'max_revenue']),
-            function (Builder $q) use ($request) {
-                $q->whereHas('productable', function ($subQuery) use ($request) {
-                    $subQuery->whereBetween('monthly_revenue', [$request->min_revenue, $request->max_revenue]);
-                });
-            },
-            function (Builder $q) use ($request) {
-                $this->applyMinRevenueFilter($q, $request);
-                $this->applyMaxRevenueFilter($q, $request);
-            }
-        );
-    }
-
-    private function applyMinRevenueFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->has('min_revenue'), function ($q) use ($request) {
-            $q->whereHas('productable', fn($subQuery) => $subQuery->where('monthly_revenue', '>=', $request->min_revenue));
-        });
-    }
-
-    private function applyMaxRevenueFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->has('max_revenue'), function ($q) use ($request) {
-            $q->whereHas('productable', fn($subQuery) => $subQuery->where('monthly_revenue', '<=', $request->max_revenue));
-        });
-    }
-
-    private function applyBusinessLocationFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->has('business_locations'), function ($q) use ($request) {
-            $q->whereHas('productable', fn($subQuery) => $subQuery->whereJsonContains('business_locations', $request->business_locations));
-        });
-    }
-
-    private function applyBusinessAgeFilter(Builder $query, Request $request): void
-    {
-        $query->when($request->has('business_age'), function ($q) use ($request) {
-            $q->whereHas('productable', function (Builder $subQuery) use ($request) {
-                $businessAgeByMonth = $request->business_age * 12;
-                $subQuery->where('business_age', '<=', $businessAgeByMonth);
-            });
-        });
-    }
-
-    private function applyInstagramFilters(Builder $query, Request $request): void
-    {
-        $query->when($request->has('instagram_type'), function ($q) use ($request) {
-            //
-        });
     }
 
     private function applySorting(Builder $query, Request $request): void
