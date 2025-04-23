@@ -4,76 +4,30 @@ namespace App\Services\Products\SocialMedia;
 
 use App\Models\Products\Product;
 use App\Models\Products\YoutubeChannel;
-use Illuminate\Http\UploadedFile;
+use App\Services\Products\SocialMedia\Abstracts\BaseSocialMediaService;
 
-class YoutubeChannelService
+class YoutubeChannelService extends BaseSocialMediaService
 {
-    public function storeOrUpdate(array $data): YoutubeChannel
+    protected array $serviceSpecificFields = [
+        'url', 'business_locations', 'business_age',
+        'subscribers_count', 'monthly_revenue', 'monthly_views',
+        'monetization_method', 'analytics_screenshot', 'listing_images'
+    ];
+
+    protected string $fileStoragePath = 'products/social_media/youtube';
+
+    protected function updateOrCreateMedia(Product $product, array $mediaData): YoutubeChannel
     {
-        $youtubeData = $this->getYoutubeData($data);
-        $productData = $this->getProductData($data, $youtubeData);
+        $media = $product->productable;
 
-        $product = Product::updateOrCreate(['uuid' => $productData['uuid']], $productData);
-        return $this->updateOrCreateYoutubeChannel($product, $youtubeData);
-    }
-
-    private function getYoutubeData(array $data): array
-    {
-        $youtubeData = collect($data)->only([
-            'url', 'business_locations', 'business_age',
-            'subscribers_count', 'monthly_revenue', 'monthly_views',
-            'monetization_method', 'analytics_screenshot', 'listing_images'
-        ])->toArray();
-
-        $youtubeData['analytics_screenshot'] = $this->handleAnalyticsScreenshot($youtubeData['analytics_screenshot'] ?? null);
-        $youtubeData['listing_images'] = $this->handleListingImages($youtubeData['listing_images'] ?? []);
-        return $this->sanitizeNullableData($youtubeData);
-    }
-
-    private function getProductData(array $data, array $youtubeData): array
-    {
-        return collect($data)->except(array_keys($youtubeData))->toArray();
-    }
-
-    private function handleAnalyticsScreenshot(UploadedFile|null $file): ?string
-    {
-        if (!$file instanceof UploadedFile) {
-            return null;
-        }
-
-        return $file->store('products/social_media/youtube/analytics_screenshots', 'public');
-    }
-
-    private function handleListingImages(array $files): array
-    {
-        $paths = [];
-
-        foreach ($files as $file) {
-            if ($file instanceof UploadedFile) {
-                $paths[] = $file->store('products/social_media/youtube/listing_images', 'public');
-            }
-        }
-
-        return $paths;
-    }
-
-    private function sanitizeNullableData($data): array
-    {
-        return collect($data)->filter()->toArray();
-    }
-
-    private function updateOrCreateYoutubeChannel(Product $product, array $youtubeData): YoutubeChannel
-    {
-        $youtube = $product->productable;
-        if ($youtube instanceof YoutubeChannel) {
-            $youtube->update($youtubeData);
+        if ($media instanceof YoutubeChannel) {
+            $media->update($mediaData);
         } else {
-            $youtube = YoutubeChannel::create($youtubeData);
-            $product->productable_id = $youtube->id;
-            $product->productable_type = YoutubeChannel::class;
+            $media = YoutubeChannel::create($mediaData);
+            $product->productable()->associate($media);
             $product->save();
         }
 
-        return $youtube->fresh(['product']);
+        return $media->fresh(['product']);
     }
 }
