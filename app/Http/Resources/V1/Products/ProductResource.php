@@ -3,9 +3,11 @@
 namespace App\Http\Resources\V1\Products;
 
 use App\Http\Resources\V1\Products\SocialMedia\SecondInstagramAccountResource;
+use App\Http\Resources\V1\Products\SocialMedia\SecondTiktokAccountResource;
 use App\Http\Resources\V1\Products\SocialMedia\SecondYoutubeChannelResource;
 use App\Http\Resources\V1\User\UserResource;
 use App\Models\Products\InstagramAccount;
+use App\Models\Products\TiktokAccount;
 use App\Models\Products\YoutubeChannel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -53,6 +55,7 @@ class ProductResource extends JsonResource
         return match (true) {
             $productable instanceof YoutubeChannel => SecondYoutubeChannelResource::make($productable),
             $productable instanceof InstagramAccount => SecondInstagramAccountResource::make($productable),
+            $productable instanceof TiktokAccount => SecondTiktokAccountResource::make($productable),
             default => null,
         };
     }

@@ -15,7 +15,7 @@ class InstagramAccountController extends Controller
 
     public function store(InstagramAccountRequest $request): InstagramAccountResource
     {
-        $youtubeChannel = $this->service->storeOrUpdate($request->validated());
-        return new InstagramAccountResource($youtubeChannel);
+        $instagramAccount = $this->service->storeOrUpdate($request->validated());
+        return new InstagramAccountResource($instagramAccount);
     }
 }
