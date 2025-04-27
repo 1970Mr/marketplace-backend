@@ -24,7 +24,8 @@ class OfferResource extends JsonResource
             'status' => OfferType::getLabelByValue($this->status->value),
             'product' => ProductResource::make($this->whenLoaded('product')),
             'chat' => ChatResource::make($this->whenLoaded('chat')),
-            'user' => UserResource::make($this->whenLoaded('user')),
+            'buyer' => UserResource::make($this->whenLoaded('buyer')),
+            'seller' => UserResource::make($this->whenLoaded('seller')),
             'created_at' => $this->created_at
         ];
     }

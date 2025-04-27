@@ -17,8 +17,8 @@ class OfferController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        $offers = Offer::whereUserId(auth()->id())
-            ->with(['product', 'chat'])
+        $offers = Offer::whereSellerId(auth()->id())
+            ->with(['product', 'chat', 'buyer'])
             ->latest()
             ->paginate(10);
 
@@ -36,7 +36,8 @@ class OfferController extends Controller
         ]);
 
         $offer = $chat->offers()->create([
-            'user_id' => auth()->id(),
+            'buyer_id' => auth()->id(),
+            'seller_id' => $product->user_id,
             'product_id' => $product->id,
             'amount' => $request->amount,
         ]);
@@ -51,7 +52,7 @@ class OfferController extends Controller
 
         return response()->json([
             'message' => 'Offer submitted successfully',
-            'data' => OfferResource::make($offer->fresh(['product', 'chat', 'user']))
+            'data' => OfferResource::make($offer->fresh(['product', 'chat', 'buyer', 'seller']))
         ], 201);
     }
 

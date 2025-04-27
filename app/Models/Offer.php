@@ -15,7 +15,8 @@ class Offer extends Model
         'amount',
         'status',
         'product_id',
-        'user_id',
+        'buyer_id',
+        'seller_id',
         'chat_id',
     ];
 
@@ -38,9 +39,14 @@ class Offer extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function user(): BelongsTo
+    public function buyer(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'buyer_id');
+    }
+
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function chat(): BelongsTo

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->unsignedTinyInteger('status')->default(OfferType::PENDING);
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('chat_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
