@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\Message;
+namespace App\Enums\Messenger;
 
 use App\Traits\Helpers\EnumHelper;
 

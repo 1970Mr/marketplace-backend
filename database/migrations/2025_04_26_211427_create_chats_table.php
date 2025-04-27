@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Messenger\ChatType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,6 +15,7 @@ return new class extends Migration
         Schema::create('chats', static function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique();
+            $table->unsignedTinyInteger('type')->default(ChatType::NORMAL);
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();

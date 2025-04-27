@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\Offer;
+namespace App\Enums\Offers;
 
 use App\Traits\Helpers\EnumHelper;
 

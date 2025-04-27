@@ -5,7 +5,7 @@ namespace App\Http\Resources\V1\Products;
 use App\Http\Resources\V1\Products\SocialMedia\SecondInstagramAccountResource;
 use App\Http\Resources\V1\Products\SocialMedia\SecondTiktokAccountResource;
 use App\Http\Resources\V1\Products\SocialMedia\SecondYoutubeChannelResource;
-use App\Http\Resources\V1\User\UserResource;
+use App\Http\Resources\V1\Users\UserResource;
 use App\Models\Products\InstagramAccount;
 use App\Models\Products\TiktokAccount;
 use App\Models\Products\YoutubeChannel;
