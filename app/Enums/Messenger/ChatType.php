@@ -4,7 +4,7 @@ namespace App\Enums\Messenger;
 
 use App\Traits\Helpers\EnumHelper;
 
-Enum ChatType: int
+enum ChatType: int
 {
     use EnumHelper;
 

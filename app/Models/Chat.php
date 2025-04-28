@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Messenger\ChatType;
+use App\Models\Products\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +33,11 @@ class Chat extends Model
         });
     }
 
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'buyer_id');
@@ -44,7 +50,7 @@ class Chat extends Model
 
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class)->latest();
+        return $this->hasMany(Message::class);
     }
 
     public function lastMessage(): HasOne

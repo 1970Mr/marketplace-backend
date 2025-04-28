@@ -4,7 +4,7 @@ namespace App\Enums\Products;
 
 use App\Traits\Helpers\EnumHelper;
 
-Enum SocialMediaType: string
+enum SocialMediaType: string
 {
     use EnumHelper;
 

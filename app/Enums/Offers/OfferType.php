@@ -4,7 +4,7 @@ namespace App\Enums\Offers;
 
 use App\Traits\Helpers\EnumHelper;
 
-Enum OfferType: int
+enum OfferType: int
 {
     use EnumHelper;
 

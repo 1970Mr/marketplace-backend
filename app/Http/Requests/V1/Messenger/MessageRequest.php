@@ -24,8 +24,8 @@ class MessageRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'chat_uuid' => 'required|exists:chats,uuid',
             'content' => 'required_without:offer_id|string|max:1000',
-            'offer_id' => 'nullable|exists:offers,id',
             'type' => ['sometimes', Rule::enum(MessageType::class)],
         ];
     }
