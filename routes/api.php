@@ -11,20 +11,25 @@ use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    // Auth
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     Route::get('/user', [AuthController::class, 'getUser'])->middleware('auth:sanctum');
 
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{product:uuid}', [ProductController::class, 'show']);
+    // Products
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductController::class, 'index']);
+        Route::get('/{product:uuid}', [ProductController::class, 'show']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/products/youtube-channel', [YoutubeChannelController::class, 'store'])->middleware('auth:sanctum');
-        Route::post('/products/instagram-account', [InstagramAccountController::class, 'store'])->middleware('auth:sanctum');
-        Route::post('/products/tiktok-account', [TiktokAccountController::class, 'store'])->middleware('auth:sanctum');
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/youtube-channel', [YoutubeChannelController::class, 'store']);
+            Route::post('/instagram-account', [InstagramAccountController::class, 'store']);
+            Route::post('/tiktok-account', [TiktokAccountController::class, 'store']);
+        });
     });
 
+    // Panel
     Route::prefix('panel')->middleware('auth:sanctum')->group(function () {
         // Offers
         Route::get('/offers', [OfferController::class, 'index']);
@@ -33,10 +38,11 @@ Route::prefix('v1')->group(function () {
 
         // Chats
         Route::get('/chats', [ChatController::class, 'index']);
-        Route::get('/chats/{chat}', [ChatController::class, 'show']);
+        Route::get('/chats/{chat:uuid}', [ChatController::class, 'show']);
+        Route::post('/chats/get-or-create', [ChatController::class, 'getOrCreate']);
+        Route::get('/chats/{chat:uuid}/messages', [MessageController::class, 'index']);
 
         // Messages
-        Route::get('/chats/{chat:uuid}/messages', [MessageController::class, 'index']);
         Route::post('/messages', [MessageController::class, 'store']);
         Route::patch('/messages/{message:uuid}/read', [MessageController::class, 'markAsRead']);
     });
