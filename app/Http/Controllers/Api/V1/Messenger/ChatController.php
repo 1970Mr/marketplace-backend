@@ -6,22 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Messenger\ChatRequest;
 use App\Http\Resources\V1\Messenger\ChatResource;
 use App\Models\Chat;
-use App\Models\Products\Product;
+use App\Services\Messenger\ChatService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ChatController extends Controller
 {
+    public function __construct(protected ChatService $chatService)
+    {
+    }
+
     public function index(): AnonymousResourceCollection
     {
-        $chats = Chat::with(['buyer', 'seller', 'product.productable', 'lastMessage'])
-            ->where(function ($query) {
-                $query->where('buyer_id', auth()->id())
-                    ->orWhere('seller_id', auth()->id());
-            })
-            ->withCount('unreadMessages')
-            ->latest()
-            ->get();
-
+        $chats = $this->chatService->getUserChats(auth()->id());
         return ChatResource::collection($chats);
     }
 
@@ -33,14 +29,7 @@ class ChatController extends Controller
 
     public function getOrCreate(ChatRequest $request): ChatResource
     {
-        $product = Product::where('uuid', $request->product_uuid)->first();
-
-        $chat = Chat::firstOrCreate([
-            'product_id' => $product->id,
-            'buyer_id' => auth()->id(),
-            'seller_id' => $product->user_id
-        ]);
-
+        $chat = $this->chatService->findOrCreateChat($request->product_uuid, auth()->id());
         return ChatResource::make($chat->fresh(['product', 'buyer', 'seller']));
     }
 }

@@ -7,38 +7,36 @@ use App\Http\Requests\V1\Messenger\MessageRequest;
 use App\Http\Resources\V1\Messenger\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Services\Messenger\MessageService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class MessageController extends Controller
 {
+    public function __construct(protected MessageService $messageService)
+    {
+    }
+
     public function index(Chat $chat): AnonymousResourceCollection
     {
-        $messages = $chat->messages()
-            ->with(['user', 'offer'])
-            ->get();
-
+        $messages = $this->messageService->getChatMessages($chat);
         return MessageResource::collection($messages);
     }
 
     public function store(MessageRequest $request): MessageResource
     {
-        $chat = Chat::where('uuid', $request->get('chat_uuid'))->firstOrFail();
-
-        $message = $chat->messages()->create([
-            'user_id' => auth()->id(),
-            'content' => $request->get('content'),
-        ]);
+        $message = $this->messageService->createMessage(
+            $request->get('chat_uuid'),
+            auth()->id(),
+            $request->get('content')
+        );
 
         return MessageResource::make($message->fresh(['user', 'offer']));
     }
 
     public function markAsRead(Message $message): Response
     {
-        if (!$message->read_at && $message->user_id !== auth()->id()) {
-            $message->update(['read_at' => now()]);
-        }
-
+        $this->messageService->markMessageAsRead($message, auth()->id());
         return response()->noContent();
     }
 }
