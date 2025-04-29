@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Messenger;
+namespace App\Services\Panel\Messenger;
 
 use App\Models\Chat;
 use App\Models\Message;

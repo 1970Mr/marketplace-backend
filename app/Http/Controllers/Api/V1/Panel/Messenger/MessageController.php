@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Messenger;
+namespace App\Http\Controllers\Api\V1\Panel\Messenger;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Messenger\MessageRequest;
 use App\Http\Resources\V1\Messenger\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
-use App\Services\Messenger\MessageService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class MessageController extends Controller
 {
-    public function __construct(protected MessageService $messageService)
+    public function __construct(protected \App\Services\Panel\Messenger\MessageService $messageService)
     {
     }
 

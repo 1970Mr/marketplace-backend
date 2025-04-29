@@ -59,17 +59,4 @@ class ProductService
     {
         return in_array($field, ['created_at', 'price']) ? $field : 'created_at';
     }
-
-    public function getMetaData(LengthAwarePaginator $paginator): array
-    {
-        return [
-            'current_page' => $paginator->currentPage(),
-            'last_page' => $paginator->lastPage(),
-            'per_page' => $paginator->perPage(),
-            'total' => $paginator->total(),
-            'from' => $paginator->firstItem(),
-            'to' => $paginator->lastItem(),
-            'has_more_pages' => $paginator->hasMorePages(),
-        ];
-    }
 }

@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
-use App\Http\Controllers\Api\V1\Messenger\ChatController;
-use App\Http\Controllers\Api\V1\Messenger\MessageController;
-use App\Http\Controllers\Api\V1\Offers\OfferController;
+use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
+use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
+use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
 use App\Http\Controllers\Api\V1\Products\ProductController;
+use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProductController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\InstagramAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\TiktokAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
@@ -45,5 +46,9 @@ Route::prefix('v1')->group(function () {
         // Messages
         Route::post('/messages', [MessageController::class, 'store']);
         Route::patch('/messages/{message:uuid}/read', [MessageController::class, 'markAsRead']);
+
+        // Products
+        Route::get('/products', [PanelProductController::class, 'index']);
+        Route::get('/products/{product:uuid}', [PanelProductController::class, 'edit']);
     });
 });

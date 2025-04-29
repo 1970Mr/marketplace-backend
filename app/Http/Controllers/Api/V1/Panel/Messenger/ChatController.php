@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Messenger;
+namespace App\Http\Controllers\Api\V1\Panel\Messenger;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Messenger\ChatRequest;
 use App\Http\Resources\V1\Messenger\ChatResource;
 use App\Models\Chat;
-use App\Services\Messenger\ChatService;
+use App\Services\Panel\Messenger\ChatService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ChatController extends Controller

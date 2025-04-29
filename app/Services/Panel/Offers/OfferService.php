@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Offers;
+namespace App\Services\Panel\Offers;
 
 use App\Enums\Messenger\MessageType;
 use App\Models\Chat;

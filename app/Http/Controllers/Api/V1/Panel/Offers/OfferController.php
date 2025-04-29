@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Offers;
+namespace App\Http\Controllers\Api\V1\Panel\Offers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Offers\ChangeStatusRequest;
 use App\Http\Requests\V1\Offers\OfferRequest;
 use App\Http\Resources\V1\Offers\OfferResource;
 use App\Models\Offer;
-use App\Services\Offers\OfferService;
+use App\Services\Panel\Offers\OfferService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
