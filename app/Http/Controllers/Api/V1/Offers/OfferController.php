@@ -9,6 +9,7 @@ use App\Http\Resources\V1\Offers\OfferResource;
 use App\Models\Offer;
 use App\Services\Offers\OfferService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class OfferController extends Controller
@@ -17,9 +18,9 @@ class OfferController extends Controller
     {
     }
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $offers = $this->offerService->getOffersForSeller(auth()->id());
+        $offers = $this->offerService->getOffersForSeller($request, auth()->id());
         return OfferResource::collection($offers);
     }
 

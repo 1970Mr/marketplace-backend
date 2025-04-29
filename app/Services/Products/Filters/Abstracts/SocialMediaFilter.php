@@ -37,7 +37,6 @@ abstract class SocialMediaFilter implements PlatformFilter
     private function applyBusinessLocationFilter(Builder $query, Request $request): void
     {
         $query->when($request->has('business_locations'), function ($q) use ($request) {
-//            $q->whereHas('productable', fn($sub) => $sub->whereJsonContains('business_locations', $request->business_locations));
             $q->whereHas('productable', function ($sub) use ($request) {
                 $sub->where(function ($inner) use ($request) {
                     foreach ($request->business_locations as $location) {

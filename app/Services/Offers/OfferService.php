@@ -6,16 +6,38 @@ use App\Enums\Messenger\MessageType;
 use App\Models\Chat;
 use App\Models\Offer;
 use App\Models\Products\Product;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class OfferService
 {
-    public function getOffersForSeller(int $sellerId): LengthAwarePaginator
+    public function getOffersForSeller(Request $request, int $sellerId): LengthAwarePaginator
     {
-        return Offer::whereSellerId($sellerId)
-            ->with(['product', 'chat', 'buyer'])
-            ->latest()
-            ->paginate(10);
+        $query = Offer::whereSellerId($sellerId)
+            ->with(['product', 'chat', 'buyer']);
+
+        $this->applySearch($query, $request);
+        $this->applyFilters($query, $request);
+
+        return $query->latest()
+            ->paginate($request->input('per_page', 10));
+    }
+
+    private function applySearch(Builder $query, Request $request): void
+    {
+        $query->when($request->filled('search'), function (Builder $q) use ($request) {
+            $q->whereHas('product', function (Builder $sub) use ($request) {
+                $sub->whereLike('title', "%$request->search%");
+            });
+        });
+    }
+
+    private function applyFilters(Builder $query, Request $request): void
+    {
+        $query->when($request->filled('status'),
+            fn($q) => $q->where('status', $request->status)
+        );
     }
 
     public function createOffer(string $productUuid, int $buyerId, float $amount): Offer
