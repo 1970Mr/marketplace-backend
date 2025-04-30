@@ -2,14 +2,19 @@
 
 namespace App\Services\Panel\Products;
 
+use App\Enums\Products\ProductType;
 use App\Models\Products\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
-class ProductService
+readonly class ProductService
 {
+    public function __construct(protected SocialMediaService $socialMediaService)
+    {
+    }
+
     public function getFilteredProducts(Request $request): LengthAwarePaginator
     {
         $query = Product::published()
@@ -45,5 +50,19 @@ class ProductService
         $query->when($request->filled('type'),
             fn($q) => $q->where('type', $request->type)
         );
+    }
+
+    public function deleteProductImages(Product $product): void
+    {
+        if ($product->type === ProductType::SOCIAL_MEDIA_ACCOUNT) {
+            $this->socialMediaService->deleteSocialMediaImages($product);
+        }
+    }
+
+    public function deleteProduct(Product $product): void
+    {
+        abort_if($product->user_id !== Auth::id(), 401);
+        $this->deleteProductImages($product);
+        $product->delete();
     }
 }

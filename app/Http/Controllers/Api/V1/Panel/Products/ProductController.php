@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Products\ProductResource;
 use App\Models\Products\Product;
 use App\Services\Panel\Products\ProductService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class ProductController extends Controller
 {
@@ -28,9 +28,9 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
-    public function edit(Product $product): JsonResponse
+    public function destroy(Product $product): Response
     {
-        $product->load(['productable', 'user']);
-        return ProductResource::make($product)->response();
+        $this->productService->deleteProduct($product);
+        return response()->noContent();
     }
 }
