@@ -22,6 +22,17 @@ class ProductService
             ->paginate($request->input('per_page', 10));
     }
 
+    public function getDraftProducts(Request $request): LengthAwarePaginator
+    {
+        $query = Product::draft()
+            ->whereUserId(Auth::id());
+
+        $this->applySearch($query, $request);
+
+        return $query->latest()
+            ->paginate($request->input('per_page', 10));
+    }
+
     private function applySearch(Builder $query, Request $request): void
     {
         $query->when($request->filled('search'), function (Builder $q) use ($request) {

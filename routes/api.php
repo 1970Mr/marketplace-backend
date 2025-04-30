@@ -49,6 +49,7 @@ Route::prefix('v1')->group(function () {
 
         // Products
         Route::get('/products', [PanelProductController::class, 'index']);
+        Route::get('/products/draft', [PanelProductController::class, 'getDraftProducts']);
         Route::get('/products/{product:uuid}', [PanelProductController::class, 'edit']);
     });
 });

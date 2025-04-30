@@ -22,6 +22,12 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
+    public function getDraftProducts(Request $request): AnonymousResourceCollection
+    {
+        $products = $this->productService->getDraftProducts($request);
+        return ProductResource::collection($products);
+    }
+
     public function edit(Product $product): JsonResponse
     {
         $product->load(['productable', 'user']);
