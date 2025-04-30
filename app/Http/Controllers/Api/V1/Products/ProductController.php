@@ -27,4 +27,9 @@ class ProductController extends Controller
         $product->load(['productable', 'user']);
         return ProductResource::make($product)->response();
     }
+
+    public function showProductDetails(Product $product): JsonResponse
+    {
+        return $this->productService->getProductDetailsResource($product)->response();
+    }
 }

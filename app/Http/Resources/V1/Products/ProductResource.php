@@ -48,7 +48,7 @@ class ProductResource extends JsonResource
         return $base;
     }
 
-    private function getProductableResource()
+    private function getProductableResource(): mixed
     {
         $productable = $this->productable;
 

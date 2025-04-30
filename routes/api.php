@@ -22,6 +22,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::get('/{product:uuid}', [ProductController::class, 'show']);
+        Route::get('/{product:uuid}/details', [ProductController::class, 'showProductDetails']);
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/youtube-channel', [YoutubeChannelController::class, 'store']);
