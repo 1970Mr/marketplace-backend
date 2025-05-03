@@ -34,23 +34,36 @@ Route::prefix('v1')->group(function () {
     // Panel
     Route::prefix('panel')->middleware('auth:sanctum')->group(function () {
         // Offers
-        Route::get('/offers', [OfferController::class, 'index']);
-        Route::post('/offers', [OfferController::class, 'store']);
-        Route::patch('/offers/{offer:uuid}/status', [OfferController::class, 'changeStatus']);
+        Route::prefix('offers')->group(function () {
+            Route::get('/seller', [OfferController::class, 'sellerOffers']);
+            Route::get('/buyer', [OfferController::class, 'buyerOffers']);
+            Route::post('/', [OfferController::class, 'store']);
+            Route::patch('/{offer:uuid}/status', [OfferController::class, 'changeStatus']);
+        });
 
         // Chats
-        Route::get('/chats', [ChatController::class, 'index']);
-        Route::get('/chats/{chat:uuid}', [ChatController::class, 'show']);
-        Route::post('/chats/get-or-create', [ChatController::class, 'getOrCreate']);
-        Route::get('/chats/{chat:uuid}/messages', [MessageController::class, 'index']);
+        Route::prefix('chats')->group(function () {
+            Route::get('/', [ChatController::class, 'index']);
+            Route::get('/{chat:uuid}', [ChatController::class, 'show']);
+            Route::post('/get-or-create', [ChatController::class, 'getOrCreate']);
+
+            // Chat Messages
+            Route::prefix('/{chat:uuid}/messages')->group(function () {
+                Route::get('/', [MessageController::class, 'index']);
+            });
+        });
 
         // Messages
-        Route::post('/messages', [MessageController::class, 'store']);
-        Route::patch('/messages/{message:uuid}/read', [MessageController::class, 'markAsRead']);
+        Route::prefix('messages')->group(function () {
+            Route::post('/', [MessageController::class, 'store']);
+            Route::patch('/{message:uuid}/read', [MessageController::class, 'markAsRead']);
+        });
 
         // Products
-        Route::get('/products', [PanelProductController::class, 'index']);
-        Route::get('/products/draft', [PanelProductController::class, 'getDraftProducts']);
-        Route::delete('/products/{product:uuid}', [PanelProductController::class, 'destroy']);
+        Route::prefix('products')->group(function () {
+            Route::get('/', [PanelProductController::class, 'index']);
+            Route::get('/draft', [PanelProductController::class, 'getDraftProducts']);
+            Route::delete('/{product:uuid}', [PanelProductController::class, 'destroy']);
+        });
     });
 });

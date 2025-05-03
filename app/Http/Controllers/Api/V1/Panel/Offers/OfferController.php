@@ -18,9 +18,15 @@ class OfferController extends Controller
     {
     }
 
-    public function index(Request $request): AnonymousResourceCollection
+    public function sellerOffers(Request $request): AnonymousResourceCollection
     {
-        $offers = $this->offerService->getOffersForSeller($request, auth()->id());
+        $offers = $this->offerService->getOffersForUser($request, auth()->id());
+        return OfferResource::collection($offers);
+    }
+
+    public function buyerOffers(Request $request): AnonymousResourceCollection
+    {
+        $offers = $this->offerService->getOffersForUser($request, auth()->id(), 'buyer_id');
         return OfferResource::collection($offers);
     }
 

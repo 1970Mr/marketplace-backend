@@ -12,10 +12,10 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class OfferService
 {
-    public function getOffersForSeller(Request $request, int $sellerId): LengthAwarePaginator
+    public function getOffersForUser(Request $request, int $userId, string $userColumn = 'seller_id'): LengthAwarePaginator
     {
-        $query = Offer::whereSellerId($sellerId)
-            ->with(['product', 'chat', 'buyer']);
+        $query = Offer::where($userColumn, $userId)
+            ->with(['product', 'chat', 'buyer', 'seller']);
 
         $this->applySearch($query, $request);
         $this->applyFilters($query, $request);
