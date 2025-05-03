@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/youtube-channel', [YoutubeChannelController::class, 'store']);
             Route::post('/instagram-account', [InstagramAccountController::class, 'store']);
             Route::post('/tiktok-account', [TiktokAccountController::class, 'store']);
+            Route::post('/tiktok-account/{product:uuid}/verify', [TiktokAccountController::class, 'verify']);
         });
     });
 

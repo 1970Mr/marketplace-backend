@@ -7,12 +7,13 @@ use App\Http\Requests\V1\Messenger\MessageRequest;
 use App\Http\Resources\V1\Messenger\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Services\Panel\Messenger\MessageService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class MessageController extends Controller
 {
-    public function __construct(protected \App\Services\Panel\Messenger\MessageService $messageService)
+    public function __construct(protected MessageService $messageService)
     {
     }
 
