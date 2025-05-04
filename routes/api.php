@@ -24,6 +24,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/{product:uuid}', [ProductController::class, 'show']);
         Route::get('/{product:uuid}/details', [ProductController::class, 'showProductDetails']);
 
+        // Special products
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/youtube-channel', [YoutubeChannelController::class, 'store']);
             Route::post('/instagram-account', [InstagramAccountController::class, 'store']);
