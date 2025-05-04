@@ -2,6 +2,7 @@
 
 namespace App\Services\Panel\Messenger;
 
+use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Message;
 use Illuminate\Database\Eloquent\Collection;
@@ -20,10 +21,14 @@ class MessageService
         $this->activateChatIfSeller($chat, $userId);
         $this->ensureChatIsActiveForBuyer($chat, $userId);
 
-        return $chat->messages()->create([
+        $message = $chat->messages()->create([
             'user_id' => $userId,
             'content' => $content,
         ]);
+
+        broadcast(new MessageSent($message))->toOthers();
+
+        return $message;
     }
 
     private function activateChatIfSeller(Chat $chat, int $userId): void
