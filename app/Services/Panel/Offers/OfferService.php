@@ -82,4 +82,10 @@ class OfferService
             'offer_id' => $offerId,
         ]);
     }
+
+    public function deleteOffer(Offer $offer, int $buyerId): void
+    {
+        abort_if($offer->buyer_id !== $buyerId, 401);
+        $offer->delete();
+    }
 }

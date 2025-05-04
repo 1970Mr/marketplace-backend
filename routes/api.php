@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/seller', [OfferController::class, 'sellerOffers']);
             Route::get('/buyer', [OfferController::class, 'buyerOffers']);
             Route::post('/', [OfferController::class, 'store']);
+            Route::delete('/{offer:uuid}', [OfferController::class, 'destroy']);
             Route::patch('/{offer:uuid}/status', [OfferController::class, 'changeStatus']);
         });
 

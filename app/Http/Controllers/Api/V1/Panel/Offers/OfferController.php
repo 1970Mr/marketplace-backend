@@ -11,6 +11,8 @@ use App\Services\Panel\Offers\OfferService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class OfferController extends Controller
 {
@@ -48,5 +50,11 @@ class OfferController extends Controller
             'message' => 'Offer status updated',
             'data' => OfferResource::make($offer->fresh())
         ]);
+    }
+
+    public function destroy(Offer $offer): Response
+    {
+        $this->offerService->deleteOffer($offer, Auth::id());
+        return response()->noContent();
     }
 }
