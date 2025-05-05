@@ -14,3 +14,7 @@ Broadcast::channel('chat.{chatUuid}', static function ($user, $chatUuid) {
 
     return $chatIsExists ? ['id' => $user->id, 'name' => $user->name] : false;
 });
+
+Broadcast::channel('global.online.status', static function ($user) {
+    return ['id' => $user->id, 'name' => $user->name];
+});
