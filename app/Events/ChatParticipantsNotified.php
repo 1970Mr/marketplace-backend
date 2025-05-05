@@ -2,22 +2,21 @@
 
 namespace App\Events;
 
-use App\Http\Resources\V1\Messenger\MessageResource;
 use App\Models\Message;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent implements ShouldBroadcast
+class ChatParticipantsNotified implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(readonly public Message $message)
+    public function __construct(public Message $message)
     {
         //
     }
@@ -30,14 +29,16 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('chat.' . $this->message->chat->uuid),
+            new PrivateChannel('user.' . $this->message->chat->buyer_id),
+            new PrivateChannel('user.' . $this->message->chat->seller_id),
         ];
     }
 
     public function broadcastWith(): array
     {
         return [
-            'message' => MessageResource::make($this->message->load(['user', 'offer']))
+            'message' => $this->message->load(['user', 'offer']),
+            'chat_uuid' => $this->message->chat->uuid
         ];
     }
 }

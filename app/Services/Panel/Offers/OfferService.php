@@ -3,6 +3,7 @@
 namespace App\Services\Panel\Offers;
 
 use App\Enums\Messenger\MessageType;
+use App\Events\ChatParticipantsNotified;
 use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Offer;
@@ -84,6 +85,7 @@ class OfferService
         ]);
 
         broadcast(new MessageSent($message->fresh(['user', 'offer'])))->toOthers();
+        broadcast(new ChatParticipantsNotified($message))->toOthers();
     }
 
     public function deleteOffer(Offer $offer, int $buyerId): void

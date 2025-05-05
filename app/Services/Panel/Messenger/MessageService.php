@@ -2,6 +2,7 @@
 
 namespace App\Services\Panel\Messenger;
 
+use App\Events\ChatParticipantsNotified;
 use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Message;
@@ -27,6 +28,7 @@ class MessageService
         ]);
 
         broadcast(new MessageSent($message))->toOthers();
+        broadcast(new ChatParticipantsNotified($message))->toOthers();
 
         return $message;
     }
