@@ -17,6 +17,8 @@ class TrackUserActivity
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check()) {
+            auth()->user()->update(['last_activity_at' => now()]);
+
             broadcast(new UserOnlineStatusChanged(auth()->id(), true));
         }
 

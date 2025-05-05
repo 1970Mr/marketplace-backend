@@ -3,6 +3,7 @@
 namespace App\Services\Panel\Offers;
 
 use App\Enums\Messenger\MessageType;
+use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Offer;
 use App\Models\Products\Product;
@@ -75,12 +76,14 @@ class OfferService
 
     private function createOfferMessage(Chat $chat, int $buyerId, int $offerId): void
     {
-        $chat->messages()->create([
+        $message = $chat->messages()->create([
             'content' => 'New offer submitted',
             'type' => MessageType::OFFER,
             'user_id' => $buyerId,
             'offer_id' => $offerId,
         ]);
+
+        broadcast(new MessageSent($message->fresh(['user', 'offer'])))->toOthers();
     }
 
     public function deleteOffer(Offer $offer, int $buyerId): void

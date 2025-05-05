@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 : route('login');
         });
 
-        $middleware->web(append: [
+        $middleware->api(append: [
             TrackUserActivity::class,
         ]);
     })

@@ -16,8 +16,9 @@ class ChatService
                     ->orWhere('seller_id', $userId);
             })
             ->withCount('unreadMessages')
-            ->latest()
-            ->get();
+            ->get()
+            ->sortByDesc(fn($chat) => optional($chat->lastMessage)->created_at)
+            ->values();
     }
 
     public function findOrCreateChat(string $productUuid, int $buyerId): Chat {

@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'last_activity_at' => $this->last_activity_at?->diffForHumans(),
         ];
     }
 }
