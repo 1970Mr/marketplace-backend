@@ -2,8 +2,8 @@
 
 namespace App\Services\Products\SocialMedia;
 
-use App\Models\Products\Product;
 use App\Models\Products\InstagramAccount;
+use App\Models\Products\Product;
 use App\Services\Products\SocialMedia\Abstracts\BaseSocialMediaService;
 
 class InstagramAccountService extends BaseSocialMediaService

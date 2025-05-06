@@ -3,6 +3,10 @@
 use App\Models\Chat;
 use Illuminate\Support\Facades\Broadcast;
 
+Broadcast::channel('global.online.status', static function ($user) {
+    return ['id' => $user->id, 'name' => $user->name];
+});
+
 Broadcast::channel('user.{id}', static function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
@@ -13,8 +17,4 @@ Broadcast::channel('chat.{chatUuid}', static function ($user, $chatUuid) {
         })->exists();
 
     return $chatIsExists ? ['id' => $user->id, 'name' => $user->name] : false;
-});
-
-Broadcast::channel('global.online.status', static function ($user) {
-    return ['id' => $user->id, 'name' => $user->name];
 });

@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\V1\Messenger;
 
-use App\Enums\Messenger\MessageType;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ChatRequest extends FormRequest
 {

@@ -2,8 +2,8 @@
 
 namespace App\Services\Products\SocialMedia;
 
-use App\Models\Products\TiktokAccount;
 use App\Models\Products\Product;
+use App\Models\Products\TiktokAccount;
 use App\Services\Products\SocialMedia\Abstracts\BaseSocialMediaService;
 
 class TiktokAccountService extends BaseSocialMediaService

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\V1\Products\SocialMedia;
 
-use App\Models\Products\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

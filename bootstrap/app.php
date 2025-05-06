@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(function (Request $request) {
             return $request->expectsJson() || $request->is('api/*')
                 ? null
-                : route('login');
+                : config('app.url');
         });
 
         $middleware->api(append: [
