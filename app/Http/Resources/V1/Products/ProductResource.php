@@ -11,6 +11,7 @@ use App\Models\Products\TiktokAccount;
 use App\Models\Products\YoutubeChannel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class ProductResource extends JsonResource
 {
@@ -38,6 +39,7 @@ class ProductResource extends JsonResource
             'is_completed' => $this->is_completed,
             'is_sponsored' => $this->is_sponsored,
             'is_active' => $this->is_active,
+            'is_in_watchlist' => $this->when($this->relationLoaded('watchers'), fn() => $this->isInWatchList()),
             'user' => UserResource::make($this->whenLoaded('user')),
         ];
 
@@ -58,5 +60,13 @@ class ProductResource extends JsonResource
             $productable instanceof TiktokAccount => SecondTiktokAccountResource::make($productable),
             default => null,
         };
+    }
+
+    private function isInWatchList(): bool
+    {
+        if (!Auth::guard('sanctum')->check()) {
+            return false;
+        }
+        return $this->watchers->contains(Auth::guard('sanctum')->id());
     }
 }

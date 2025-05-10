@@ -85,7 +85,7 @@ class OfferService
         ]);
 
         broadcast(new MessageSent($message->fresh(['user', 'offer'])))->toOthers();
-        broadcast(new ChatParticipantsNotified($message))->toOthers();
+        broadcast(new ChatParticipantsNotified($message));
     }
 
     public function deleteOffer(Offer $offer, int $buyerId): void

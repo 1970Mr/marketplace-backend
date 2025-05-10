@@ -28,7 +28,7 @@ class MessageService
         ]);
 
         broadcast(new MessageSent($message))->toOthers();
-        broadcast(new ChatParticipantsNotified($message))->toOthers();
+        broadcast(new ChatParticipantsNotified($message));
 
         return $message;
     }

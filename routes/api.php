@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
+use App\Http\Controllers\Api\V1\Panel\WatchList\WatchListController;
 use App\Http\Controllers\Api\V1\Products\ProductController;
 use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProductController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\InstagramAccountController;
@@ -67,6 +68,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [PanelProductController::class, 'index']);
             Route::get('/draft', [PanelProductController::class, 'getDraftProducts']);
             Route::delete('/{product:uuid}', [PanelProductController::class, 'destroy']);
+        });
+
+        // Watch List
+        Route::prefix('watchlist')->group(function () {
+            Route::get('/', [WatchListController::class, 'index']);
+            Route::post('/{product:uuid}/toggle', [WatchListController::class, 'toggle']);
         });
     });
 });
