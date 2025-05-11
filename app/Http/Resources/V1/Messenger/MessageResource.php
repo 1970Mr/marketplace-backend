@@ -22,6 +22,7 @@ class MessageResource extends JsonResource
             'content' => $this->content,
             'type' => MessageType::getLabelByValue($this->type->value),
             'user' => UserResource::make($this->whenLoaded('user')),
+            'chat' => OfferResource::make($this->whenLoaded('chat')),
             'offer' => OfferResource::make($this->whenLoaded('offer')),
             'is_read' => (bool)$this->read_at,
             'sent_at' => $this->created_at->diffForHumans(),

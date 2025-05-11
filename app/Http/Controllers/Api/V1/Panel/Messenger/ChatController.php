@@ -23,7 +23,7 @@ class ChatController extends Controller
 
     public function show(Chat $chat): ChatResource
     {
-        $chat->load(['product.productable', 'buyer', 'seller', 'messages']);
+        $chat = $this->chatService->loadChatRelations($chat);
         return ChatResource::make($chat);
     }
 

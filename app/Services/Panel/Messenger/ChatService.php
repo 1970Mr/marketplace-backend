@@ -30,4 +30,15 @@ class ChatService
             'seller_id' => $product->user_id
         ]);
     }
+
+    public function loadChatRelations(Chat $chat): Chat
+    {
+        return $chat->load([
+            'product.productable',
+            'buyer',
+            'seller',
+            'messages',
+            'lastMessage',
+        ])->loadCount('unreadMessages');
+    }
 }
