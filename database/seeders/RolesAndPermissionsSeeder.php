@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Enums\Acl\PermissionType;
 use App\Enums\Acl\RoleType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -22,5 +21,10 @@ class RolesAndPermissionsSeeder extends Seeder
 
         Role::query()->firstOrCreate(['name' => RoleType::SUPER_ADMIN->value])
             ->givePermissionTo(PermissionType::values());
+
+        Role::query()->firstOrCreate(['name' => RoleType::ADMIN->value])
+            ->givePermissionTo(PermissionType::values());
+
+        Role::query()->firstOrCreate(['name' => RoleType::NORMAL->value]);
     }
 }

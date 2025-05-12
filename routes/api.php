@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Acl\RoleType;
+use App\Http\Controllers\Api\V1\Admin\Users\AgentController;
 use App\Http\Controllers\Api\V1\Admin\Users\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProduct
 use App\Http\Controllers\Api\V1\Products\SocialMedia\InstagramAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\TiktokAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
+use App\Http\Middleware\CheckAdminPanelAccess;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -80,7 +82,13 @@ Route::prefix('v1')->group(function () {
     });
 
     // Admin
-    Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+    Route::prefix('admin')->middleware(['auth:sanctum', CheckAdminPanelAccess::class])->group(function () {
+        // Agents
+        Route::prefix('agents')->group(function () {
+            Route::get('/', [AgentController::class, 'index']);
+            Route::post('/', [AgentController::class, 'store']);
+        });
+
         // User Management
         Route::prefix('user-management')->group(function () {
             Route::get('/', [UserManagementController::class, 'index']);
