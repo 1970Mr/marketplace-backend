@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Users\UserStatus;
 use App\Models\Products\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,8 +25,12 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'avatar',
+        'country',
         'password',
+        'note',
         'last_activity_at',
+        'status',
     ];
 
     /**
@@ -49,6 +54,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_activity_at' => 'datetime',
+            'status' => UserStatus::class,
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\Acl\RoleType;
+use App\Http\Controllers\Api\V1\Admin\Users\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
@@ -74,6 +76,14 @@ Route::prefix('v1')->group(function () {
         Route::prefix('watchlist')->group(function () {
             Route::get('/', [WatchListController::class, 'index']);
             Route::post('/{product:uuid}/toggle', [WatchListController::class, 'toggle']);
+        });
+    });
+
+    // Admin
+    Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+        // User Management
+        Route::prefix('user-management')->group(function () {
+            Route::get('/', [UserManagementController::class, 'index']);
         });
     });
 });
