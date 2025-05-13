@@ -27,6 +27,7 @@ class UserResource extends JsonResource
             'created_at' => $this->created_at,
             'role' => $this->getUserRole(),
             'permissions' => $this->getUserPermissions(),
+            'created_at' => $this->created_at->toDateTimeString(),
         ];
     }
 

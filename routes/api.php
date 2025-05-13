@@ -93,6 +93,10 @@ Route::prefix('v1')->group(function () {
         // User Management
         Route::prefix('user-management')->group(function () {
             Route::get('/', [UserManagementController::class, 'index']);
+            Route::get('/{user}', [UserManagementController::class, 'show']);
+            Route::patch('/{user}/note', [UserManagementController::class, 'updateNote']);
+            Route::patch('/{user}/status', [UserManagementController::class, 'updateStatus']);
+            Route::get('/{user}/chats', [UserManagementController::class, 'userChats']);
         });
     });
 });

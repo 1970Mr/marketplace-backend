@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Admin\Users;
 
-use App\Http\Requests\V1\Users\StoreAgentRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\Admin\Users\StoreAgentRequest;
 use App\Http\Resources\V1\Users\UserResource;
 use App\Models\User;
 use App\Services\Admin\Users\AgentService;
@@ -10,9 +11,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class AgentController
+class AgentController extends Controller
 {
-    public function __construct(protected AgentService $agentService)
+    public function __construct(readonly protected AgentService $agentService)
     {
     }
 
