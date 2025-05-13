@@ -86,6 +86,7 @@ Route::prefix('v1')->group(function () {
         // Agents
         Route::prefix('agents')->group(function () {
             Route::get('/', [AgentController::class, 'index']);
+            Route::get('/{user}', [AgentController::class, 'show']);
             Route::post('/', [AgentController::class, 'store']);
         });
 

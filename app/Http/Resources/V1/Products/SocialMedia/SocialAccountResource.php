@@ -61,7 +61,7 @@ class SocialAccountResource extends JsonResource
             'is_sold' => $product->is_sold,
             'is_completed' => $product->is_completed,
             'is_sponsored' => $product->is_sponsored,
-            'is_active' => $product->is_active,
+            'status' => $product->status->label(),
         ];
     }
 }

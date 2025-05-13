@@ -38,7 +38,7 @@ class ProductResource extends JsonResource
             'is_sold' => $this->is_sold,
             'is_completed' => $this->is_completed,
             'is_sponsored' => $this->is_sponsored,
-            'is_active' => $this->is_active,
+            'status' => $this->status->label(),
             'is_in_watchlist' => $this->when($this->relationLoaded('watchers'), fn() => $this->isInWatchList()),
             'user' => UserResource::make($this->whenLoaded('user')),
         ];

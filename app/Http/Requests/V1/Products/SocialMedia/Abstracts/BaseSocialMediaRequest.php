@@ -13,6 +13,7 @@ abstract class BaseSocialMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Product fields
             'uuid' => ['required'],
             'user_id' => ['nullable'],
             'title' => ['nullable', 'string'],
@@ -29,7 +30,6 @@ abstract class BaseSocialMediaRequest extends FormRequest
             'is_sold' => ['boolean'],
             'is_completed' => ['boolean'],
             'is_sponsored' => ['boolean'],
-            'is_active' => ['boolean'],
 
             // Common fields
             'url' => ['nullable', 'url'],
