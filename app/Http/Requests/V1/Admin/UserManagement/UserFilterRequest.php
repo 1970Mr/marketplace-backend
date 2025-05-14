@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V1\Admin\Users\UserManagement;
+namespace App\Http\Requests\V1\Admin\UserManagement;
 
 use App\Enums\Users\UserStatus;
 use Illuminate\Foundation\Http\FormRequest;

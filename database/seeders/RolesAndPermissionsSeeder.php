@@ -16,14 +16,20 @@ class RolesAndPermissionsSeeder extends Seeder
     public function run(): void
     {
         foreach (PermissionType::cases() as $permission) {
-            Permission::query()->firstOrCreate(['name' => $permission->value]);
+            Permission::firstOrCreate([
+                'name' => $permission->value,
+                'guard_name' => 'admin-api',
+            ]);
         }
 
-        Role::query()->firstOrCreate(['name' => RoleType::SUPER_ADMIN->value])
-            ->givePermissionTo(PermissionType::values());
+        Role::firstOrCreate([
+            'name' => RoleType::SUPER_ADMIN->value,
+            'guard_name' => 'admin-api',
+        ])->givePermissionTo(PermissionType::values());
 
-        Role::query()->firstOrCreate(['name' => RoleType::ADMIN->value]);
-
-        Role::query()->firstOrCreate(['name' => RoleType::NORMAL->value]);
+        Role::firstOrCreate([
+            'name' => RoleType::ADMIN->value,
+            'guard_name' => 'admin-api',
+        ]);
     }
 }

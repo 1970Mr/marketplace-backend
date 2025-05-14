@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\V1\Users;
+namespace App\Http\Resources\V1\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class AdminResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,10 +19,9 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'avatar' => $this->getAvatarUrl(),
-            'country' => $this->country,
-            'note' => $this->note,
-            'last_activity_at' => $this->last_activity_at?->diffForHumans(),
             'status' => $this->status->label(),
+            'role' => $this->getUserRole(),
+            'permissions' => $this->getUserPermissions(),
             'created_at' => $this->created_at->toDateTimeString(),
         ];
     }
@@ -30,5 +29,16 @@ class UserResource extends JsonResource
     private function getAvatarUrl(): ?string
     {
         return $this->avatar ? asset('storage/' . $this->avatar) : null;
+    }
+
+    private function getUserRole(): string
+    {
+        return $this->whenLoaded('roles', fn() => $this->getRoleNames()->first());
+    }
+
+    private function getUserPermissions(): array
+    {
+        return $this->whenLoaded('permissions',
+            fn() => $this->getAllPermissions()->pluck('name')->toArray(), []);
     }
 }

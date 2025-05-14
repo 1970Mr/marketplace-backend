@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V1\Admin\Users\Agents;
+namespace App\Http\Requests\V1\Admin\Agents;
 
 use App\Enums\Acl\PermissionType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,7 +24,7 @@ class UpdateAgentPermissionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'permissions'   => ['required','array'],
+            'permissions' => ['required', 'array'],
             'permissions.*' => [Rule::enum(PermissionType::class)],
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V1\Admin\Users\Agents;
+namespace App\Http\Requests\V1\Admin\Agents;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,7 +23,7 @@ class StoreAgentRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:admins',
             'password' => 'required|string|min:8',
         ];
     }

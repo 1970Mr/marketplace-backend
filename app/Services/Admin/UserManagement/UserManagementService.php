@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Users;
+namespace App\Services\Admin\UserManagement;
 
 use App\Models\Chat;
 use App\Models\User;

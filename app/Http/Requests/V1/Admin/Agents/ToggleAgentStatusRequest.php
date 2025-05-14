@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests\V1\Admin\Users\Agents;
+namespace App\Http\Requests\V1\Admin\Agents;
 
-use App\Enums\Users\UserStatus;
+use App\Enums\Users\AdminStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,7 +24,7 @@ class ToggleAgentStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', Rule::enum(UserStatus::class)],
+            'status' => ['required', Rule::enum(AdminStatus::class)],
         ];
     }
 }

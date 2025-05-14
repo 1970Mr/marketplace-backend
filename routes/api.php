@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Admin\Users\AgentController;
-use App\Http\Controllers\Api\V1\Admin\Users\UserManagementController;
+use App\Http\Controllers\Api\V1\Admin\Agents\AgentController;
+use App\Http\Controllers\Api\V1\Admin\Auth\AuthController as AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
@@ -12,7 +13,6 @@ use App\Http\Controllers\Api\V1\Products\ProductController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\InstagramAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\TiktokAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
-use App\Http\Middleware\CheckAdminPanelAccess;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -80,17 +80,23 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    // Admin Auth
+    Route::prefix('admin')->group(function () {
+        Route::post('/login', [AdminAuthController::class, 'login']);
+        Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware(['auth:sanctum:admin-api']);
+        Route::get('/', [AdminAuthController::class, 'getAdmin'])->middleware('auth:sanctum:admin-api');
+    });
+
     // Admin
-    Route::prefix('admin')->middleware(['auth:sanctum', CheckAdminPanelAccess::class])->group(function () {
+    Route::prefix('admin')->middleware(['auth:sanctum:admin-api'])->group(function () {
         // Agents
         Route::prefix('agents')->group(function () {
             Route::get('/', [AgentController::class, 'index']);
-            Route::get('/{user}', [AgentController::class, 'show']);
+            Route::get('/{admin}', [AgentController::class, 'show']);
             Route::post('/', [AgentController::class, 'store']);
-            Route::post('/{user}', [AgentController::class, 'update']);
-//            Route::patch('/{user}', [AgentController::class, 'update']);
-            Route::put('/{user}/permissions', [AgentController::class, 'updatePermissions']);
-            Route::patch('/{user}/status', [AgentController::class, 'toggleStatus']);
+            Route::post('/{admin}', [AgentController::class, 'update']);
+            Route::put('/{admin}/permissions', [AgentController::class, 'updatePermissions']);
+            Route::patch('/{admin}/status', [AgentController::class, 'toggleStatus']);
         });
 
         // User Management

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Admin\Users;
+namespace App\Http\Controllers\Api\V1\Admin\UserManagement;
 
 use App\Enums\Users\UserStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\Admin\Users\UserManagement\UserFilterRequest;
+use App\Http\Requests\V1\Admin\UserManagement\UserFilterRequest;
 use App\Http\Resources\V1\Users\UserResource;
 use App\Models\User;
-use App\Services\Admin\Users\UserManagementService;
+use App\Services\Admin\UserManagement\UserManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V1\Admin\Users\Agents;
+namespace App\Http\Requests\V1\Admin\Agents;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -22,13 +22,13 @@ class UpdateAgentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('user')->id;
+        $userId = $this->route('admin')->id;
 
         return [
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => [
                 'sometimes', 'email',
-                Rule::unique('users', 'email')->ignore($userId),
+                Rule::unique('admins', 'email')->ignore($userId),
             ],
             'password' => ['sometimes', 'string', 'min:8', 'confirmed'],
             'avatar' => ['sometimes', 'file', 'image', 'max:2048'],
