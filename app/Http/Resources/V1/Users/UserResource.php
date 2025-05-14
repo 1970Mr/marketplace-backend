@@ -19,16 +19,20 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'avatar' => $this->avatar,
+            'avatar' => $this->getAvatarUrl(),
             'country' => $this->country,
             'note' => $this->note,
             'last_activity_at' => $this->last_activity_at?->diffForHumans(),
             'status' => $this->status->label(),
-            'created_at' => $this->created_at,
             'role' => $this->getUserRole(),
             'permissions' => $this->getUserPermissions(),
             'created_at' => $this->created_at->toDateTimeString(),
         ];
+    }
+
+    private function getAvatarUrl(): ?string
+    {
+        return $this->avatar ? asset('storage/' . $this->avatar) : null;
     }
 
     private function getUserRole(): string

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin\Users;
 
 use App\Enums\Users\UserStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\Admin\Users\UserManagementFilterRequest;
+use App\Http\Requests\V1\Admin\Users\UserManagement\UserFilterRequest;
 use App\Http\Resources\V1\Users\UserResource;
 use App\Models\User;
 use App\Services\Admin\Users\UserManagementService;
@@ -16,7 +16,7 @@ class UserManagementController extends Controller
 {
     public function __construct(readonly private UserManagementService $userService) {}
 
-    public function index(UserManagementFilterRequest $request): AnonymousResourceCollection
+    public function index(UserFilterRequest $request): AnonymousResourceCollection
     {
         $filters = $request->validated();
 

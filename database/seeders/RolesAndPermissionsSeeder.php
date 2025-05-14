@@ -22,8 +22,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Role::query()->firstOrCreate(['name' => RoleType::SUPER_ADMIN->value])
             ->givePermissionTo(PermissionType::values());
 
-        Role::query()->firstOrCreate(['name' => RoleType::ADMIN->value])
-            ->givePermissionTo(PermissionType::values());
+        Role::query()->firstOrCreate(['name' => RoleType::ADMIN->value]);
 
         Role::query()->firstOrCreate(['name' => RoleType::NORMAL->value]);
     }

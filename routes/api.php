@@ -1,15 +1,14 @@
 <?php
 
-use App\Enums\Acl\RoleType;
 use App\Http\Controllers\Api\V1\Admin\Users\AgentController;
 use App\Http\Controllers\Api\V1\Admin\Users\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
+use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProductController;
 use App\Http\Controllers\Api\V1\Panel\WatchList\WatchListController;
 use App\Http\Controllers\Api\V1\Products\ProductController;
-use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProductController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\InstagramAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\TiktokAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
@@ -88,6 +87,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [AgentController::class, 'index']);
             Route::get('/{user}', [AgentController::class, 'show']);
             Route::post('/', [AgentController::class, 'store']);
+            Route::post('/{user}', [AgentController::class, 'update']);
+//            Route::patch('/{user}', [AgentController::class, 'update']);
+            Route::put('/{user}/permissions', [AgentController::class, 'updatePermissions']);
+            Route::patch('/{user}/status', [AgentController::class, 'toggleStatus']);
         });
 
         // User Management
