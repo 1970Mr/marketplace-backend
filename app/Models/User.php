@@ -26,8 +26,12 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone_number',
         'avatar',
+        'company_name',
         'country',
+        'email_verified_at',
+        'phone_verified_at',
         'password',
         'note',
         'last_activity_at',
@@ -53,6 +57,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_activity_at' => 'datetime',
             'status' => UserStatus::class,

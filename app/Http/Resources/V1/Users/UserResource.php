@@ -18,12 +18,14 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'phone_number' => $this->phone_number,
             'avatar' => $this->getAvatarUrl(),
+            'company_name' => $this->company_name,
             'country' => $this->country,
             'note' => $this->note,
             'last_activity_at' => $this->last_activity_at?->diffForHumans(),
             'status' => $this->status->label(),
-            'created_at' => $this->created_at->toDateTimeString(),
+            'created_at' => $this->created_at,
         ];
     }
 

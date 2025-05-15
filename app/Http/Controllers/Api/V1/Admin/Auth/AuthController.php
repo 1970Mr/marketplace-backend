@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Auth\LoginRequest;
+use App\Http\Resources\V1\Admin\AdminResource;
 use App\Http\Resources\V1\Users\UserResource;
 use App\Services\Admin\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -28,10 +29,10 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out successfully']);
     }
 
-    public function getAdmin(Request $request): UserResource
+    public function me(Request $request): JsonResponse
     {
         $user = $request->user('admin-api');
         $user->load(['roles.permissions', 'permissions']);
-        return new UserResource($user);
+        return AdminResource::make($user)->response();
     }
 }

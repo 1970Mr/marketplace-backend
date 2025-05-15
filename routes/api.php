@@ -20,7 +20,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-    Route::get('/user', [AuthController::class, 'getUser'])->middleware('auth:sanctum');
+    Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
     // Products
     Route::prefix('products')->group(function () {
@@ -83,18 +83,18 @@ Route::prefix('v1')->group(function () {
     // Admin Auth
     Route::prefix('admin')->group(function () {
         Route::post('/login', [AdminAuthController::class, 'login']);
-        Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware(['auth:sanctum:admin-api']);
-        Route::get('/', [AdminAuthController::class, 'getAdmin'])->middleware('auth:sanctum:admin-api');
+        Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware(['auth:admin-api']);
+        Route::get('/me', [AdminAuthController::class, 'me'])->middleware('auth:admin-api');
     });
 
     // Admin
-    Route::prefix('admin')->middleware(['auth:sanctum:admin-api'])->group(function () {
+    Route::prefix('admin')->middleware(['auth:admin-api'])->group(function () {
         // Agents
         Route::prefix('agents')->group(function () {
             Route::get('/', [AgentController::class, 'index']);
             Route::get('/{admin}', [AgentController::class, 'show']);
             Route::post('/', [AgentController::class, 'store']);
-            Route::post('/{admin}', [AgentController::class, 'update']);
+            Route::put('/{admin}', [AgentController::class, 'update']);
             Route::put('/{admin}/permissions', [AgentController::class, 'updatePermissions']);
             Route::patch('/{admin}/status', [AgentController::class, 'toggleStatus']);
         });

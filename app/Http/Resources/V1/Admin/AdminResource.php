@@ -20,9 +20,9 @@ class AdminResource extends JsonResource
             'email' => $this->email,
             'avatar' => $this->getAvatarUrl(),
             'status' => $this->status->label(),
-            'role' => $this->getUserRole(),
-            'permissions' => $this->getUserPermissions(),
-            'created_at' => $this->created_at->toDateTimeString(),
+            'created_at' => $this->created_at,
+            'role' => $this->getAdminRole(),
+            'permissions' => $this->getAdminPermissions(),
         ];
     }
 
@@ -31,12 +31,12 @@ class AdminResource extends JsonResource
         return $this->avatar ? asset('storage/' . $this->avatar) : null;
     }
 
-    private function getUserRole(): string
+    private function getAdminRole(): string
     {
-        return $this->whenLoaded('roles', fn() => $this->getRoleNames()->first());
+        return $this->whenLoaded('roles', fn() => $this->getRoleNames()->first(), '');
     }
 
-    private function getUserPermissions(): array
+    private function getAdminPermissions(): array
     {
         return $this->whenLoaded('permissions',
             fn() => $this->getAllPermissions()->pluck('name')->toArray(), []);

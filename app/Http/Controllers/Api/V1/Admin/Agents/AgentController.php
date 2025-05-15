@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api\V1\Admin\Agents;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Http\Requests\V1\Admin\Agents\{
     StoreAgentRequest,
     ToggleAgentStatusRequest,
@@ -17,9 +18,9 @@ class AgentController extends Controller
 {
     public function __construct(protected AgentService $agentService) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $admins = $this->agentService->getAgent(request());
+        $admins = $this->agentService->getAgents($request);
         return AdminResource::collection($admins)->response();
     }
 

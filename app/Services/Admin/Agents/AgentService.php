@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Storage;
 
 class AgentService
 {
-    public function getAgent(Request $request): LengthAwarePaginator
+    public function getAgents(Request $request): LengthAwarePaginator
     {
-        return Admin::role('admin')
+        return Admin::with('roles')
+            ->role('admin')
             ->latest()
             ->paginate($request->get('per_page', 10));
     }
