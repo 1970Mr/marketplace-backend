@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Admin\Agents\AgentController;
 use App\Http\Controllers\Api\V1\Admin\Auth\AuthController as AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
+use App\Http\Controllers\Api\V1\Admin\ProductManagement\ProductManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
@@ -106,6 +107,14 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{user}/note', [UserManagementController::class, 'updateNote']);
             Route::patch('/{user}/status', [UserManagementController::class, 'updateStatus']);
             Route::get('/{user}/chats', [UserManagementController::class, 'userChats']);
+        });
+
+        // Product Management
+        Route::prefix('product-management')->group(function () {
+            Route::get('/', [ProductManagementController::class, 'index']);
+            Route::get('/{product_id}', [ProductManagementController::class, 'show']);
+            Route::patch('/{product_id}/status', [ProductManagementController::class, 'updateStatus']);
+            Route::delete('/{product}', [ProductManagementController::class, 'destroy']);
         });
     });
 });

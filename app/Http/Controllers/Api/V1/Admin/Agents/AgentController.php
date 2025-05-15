@@ -1,10 +1,9 @@
 <?php
+
 namespace App\Http\Controllers\Api\V1\Admin\Agents;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests\V1\Admin\Agents\{
-    StoreAgentRequest,
+use App\Http\Requests\V1\Admin\Agents\{StoreAgentRequest,
     ToggleAgentStatusRequest,
     UpdateAgentPermissionsRequest,
     UpdateAgentRequest
@@ -13,10 +12,13 @@ use App\Http\Resources\V1\Admin\AdminResource;
 use App\Models\Admin;
 use App\Services\Admin\Agents\AgentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AgentController extends Controller
 {
-    public function __construct(protected AgentService $agentService) {}
+    public function __construct(protected AgentService $agentService)
+    {
+    }
 
     public function index(Request $request): JsonResponse
     {
@@ -26,7 +28,7 @@ class AgentController extends Controller
 
     public function show(Admin $admin): JsonResponse
     {
-        $admin->load(['roles','permissions']);
+        $admin->load(['roles', 'permissions']);
         return AdminResource::make($admin)->response();
     }
 
