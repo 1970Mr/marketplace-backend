@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Admin\Auth\AuthController as AdminAuthController
 use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
 use App\Http\Controllers\Api\V1\Admin\ProductManagement\ProductManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Escrows\EscrowController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
@@ -79,6 +80,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [WatchListController::class, 'index']);
             Route::post('/{product:uuid}/toggle', [WatchListController::class, 'toggle']);
         });
+
+        // Escrow (User)
+        Route::prefix('escrows')->group(function () {
+            Route::post('/', [EscrowController::class, 'store']);
+            Route::post('{escrow}/signatures/buyer', [EscrowController::class, 'uploadBuyerSignature']);
+            Route::post('{escrow}/signatures/seller', [EscrowController::class, 'uploadSellerSignature']);
+            Route::post('{escrow}/receipts', [EscrowController::class, 'uploadReceipts']);
+            Route::post('{escrow}/slots/propose', [EscrowController::class, 'proposeSlots']);
+            Route::post('{escrow}/slots/select', [EscrowController::class, 'selectSlot']);
+            Route::post('{escrow}/slots/reject', [EscrowController::class, 'rejectScheduling']);
+        });
     });
 
     // Admin Auth
@@ -115,6 +127,16 @@ Route::prefix('v1')->group(function () {
             Route::get('/{product_id}', [ProductManagementController::class, 'show']);
             Route::patch('/{product_id}/status', [ProductManagementController::class, 'updateStatus']);
             Route::delete('/{product}', [ProductManagementController::class, 'destroy']);
+        });
+
+        // Escrow (Admin)
+        Route::prefix('escrows')->group(function () {
+            Route::post('{escrow}/accept', [EscrowController::class, 'accept']);
+            Route::post('{escrow}/payment/confirm', [EscrowController::class, 'confirmPayment']);
+            Route::post('{escrow}/delivery/confirm', [EscrowController::class, 'confirmDelivery']);
+            Route::post('{escrow}/payout/release', [EscrowController::class, 'releaseFunds']);
+            Route::post('{escrow}/cancel', [EscrowController::class, 'cancel']);
+            Route::post('{escrow}/refund', [EscrowController::class, 'refund']);
         });
     });
 });
