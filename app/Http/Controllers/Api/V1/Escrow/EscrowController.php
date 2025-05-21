@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Escrow;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\Escrow\{
-    ConfirmPaymentRequest,
+use App\Http\Requests\V1\Escrow\{ConfirmPaymentRequest,
     ProposeSlotsRequest,
     ReleaseFundsRequest,
     SelectSlotRequest,
@@ -17,6 +16,7 @@ use App\Http\Resources\V1\Escrow\TimeSlotResource;
 use App\Models\Escrow;
 use App\Services\Escrow\EscrowService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,13 +28,21 @@ class EscrowController extends Controller
 
     public function getAdminEscrows(): ResourceCollection
     {
-        $escrows = Auth::guard('admin-api')->user()?->escrows()->paginate(10);
+        $escrows = Auth::guard('admin-api')->user()?->escrows()->with(['offer', 'buyer', 'seller', 'admin'])->paginate(10);
         return EscrowResource::collection($escrows);
     }
 
-    public function getUserEscrows(): ResourceCollection
+    public function getUserEscrows(Request $request): ResourceCollection
     {
-        $escrows = Auth::user()?->escrows()->paginate(10);
+        $escrows = Auth::user()
+            ?->escrows()
+            ->with(['offer.product', 'buyer', 'seller', 'admin'])
+            ->filterByProductTitle($request->get('search'))
+            ->filterBy('status', $request->get('status'))
+            ->filterBy('phase', $request->get('phase'))
+            ->filterBy('stage', $request->get('stage'))
+            ->paginate($request->get('per_page', 10));
+
         return EscrowResource::collection($escrows);
     }
 
