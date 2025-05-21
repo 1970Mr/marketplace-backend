@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Services\Escrows;
+namespace App\Services\Escrow;
 
 use App\Enums\Escrow\EscrowPhase;
 use App\Enums\Escrow\EscrowStage;
 use App\Enums\Escrow\EscrowStatus;
 use App\Enums\Escrow\PaymentMethod;
+use App\Jobs\ExpireEscrowJob;
 use App\Models\Escrow;
 use App\Models\TimeSlot;
 use Illuminate\Http\UploadedFile;
@@ -21,12 +22,16 @@ class EscrowService
      */
     public function createEscrow(array $data): Escrow
     {
-        return Escrow::create([
+        $escrow = Escrow::create([
             'offer_id' => $data['offer_id'],
             'buyer_id' => $data['buyer_id'],
             'seller_id' => $data['seller_id'],
             'status' => EscrowStatus::PENDING,
         ]);
+
+        ExpireEscrowJob::dispatch($escrow)->delay(Carbon::now()->addDays(10));
+
+        return $escrow;
     }
 
     /**
@@ -36,8 +41,8 @@ class EscrowService
     {
         $escrow->admin_id = $adminId;
         $escrow->status = EscrowStatus::ACTIVE;
-        $escrow->current_phase = EscrowPhase::SIGNATURE;
-        $escrow->current_stage = EscrowStage::AWAITING_SIGNATURE;
+        $escrow->phase = EscrowPhase::SIGNATURE;
+        $escrow->stage = EscrowStage::AWAITING_SIGNATURE;
         $escrow->save();
 
         return $escrow;
@@ -56,8 +61,8 @@ class EscrowService
         $escrow->buyer_signature_path = $path;
 
         if ($escrow->seller_signature_path) {
-            $escrow->current_phase = EscrowPhase::PAYMENT;
-            $escrow->current_stage = EscrowStage::AWAITING_PAYMENT;
+            $escrow->phase = EscrowPhase::PAYMENT;
+            $escrow->stage = EscrowStage::AWAITING_PAYMENT;
         }
 
         $escrow->save();
@@ -78,8 +83,8 @@ class EscrowService
         $escrow->seller_signature_path = $path;
 
         if ($escrow->buyer_signature_path) {
-            $escrow->current_phase = EscrowPhase::PAYMENT;
-            $escrow->current_stage = EscrowStage::AWAITING_PAYMENT;
+            $escrow->phase = EscrowPhase::PAYMENT;
+            $escrow->stage = EscrowStage::AWAITING_PAYMENT;
         }
 
         $escrow->save();
@@ -97,7 +102,7 @@ class EscrowService
         )->toArray();
 
         $escrow->payment_receipts = array_merge($escrow->payment_receipts ?? [], $paths);
-        $escrow->current_stage = EscrowStage::PAYMENT_UPLOADED;
+        $escrow->stage = EscrowStage::PAYMENT_UPLOADED;
         $escrow->save();
 
         return $escrow;
@@ -110,8 +115,8 @@ class EscrowService
     {
         $escrow->amount_received = $amount;
         $escrow->amount_received_method = $method;
-        $escrow->current_phase = EscrowPhase::SCHEDULING;
-        $escrow->current_stage = EscrowStage::AWAITING_SCHEDULING;
+        $escrow->phase = EscrowPhase::SCHEDULING;
+        $escrow->stage = EscrowStage::AWAITING_SCHEDULING;
         $escrow->save();
 
         return $escrow;
@@ -138,7 +143,7 @@ class EscrowService
             }
         }
 
-        $escrow->current_stage = EscrowStage::SCHEDULING_SUGGESTED;
+        $escrow->stage = EscrowStage::SCHEDULING_SUGGESTED;
         $escrow->save();
 
         return $slots;
@@ -154,8 +159,8 @@ class EscrowService
         }
 
         $escrow->timeSlots()->sync([$slotId]);
-        $escrow->current_phase = EscrowPhase::DELIVERY;
-        $escrow->current_stage = EscrowStage::DELIVERY_PENDING;
+        $escrow->phase = EscrowPhase::DELIVERY;
+        $escrow->stage = EscrowStage::DELIVERY_PENDING;
         $escrow->save();
 
         return TimeSlot::findOrFail($slotId);
@@ -166,11 +171,8 @@ class EscrowService
      */
     public function rejectScheduling(Escrow $escrow): Escrow
     {
-        // detach all proposed slots
         $escrow->timeSlots()->detach();
-
-        // update stage
-        $escrow->current_stage = EscrowStage::SCHEDULING_REJECTED;
+        $escrow->stage = EscrowStage::SCHEDULING_REJECTED;
         $escrow->save();
 
         return $escrow;
@@ -181,8 +183,8 @@ class EscrowService
      */
     public function confirmDelivery(Escrow $escrow): Escrow
     {
-        $escrow->current_phase = EscrowPhase::PAYOUT;
-        $escrow->current_stage = EscrowStage::AWAITING_PAYOUT;
+        $escrow->phase = EscrowPhase::PAYOUT;
+        $escrow->stage = EscrowStage::AWAITING_PAYOUT;
         $escrow->save();
 
         return $escrow;
@@ -195,7 +197,7 @@ class EscrowService
     {
         $escrow->amount_released = $amount;
         $escrow->amount_released_method = $method;
-        $escrow->current_stage = EscrowStage::PAYOUT_COMPLETED;
+        $escrow->stage = EscrowStage::PAYOUT_COMPLETED;
         $escrow->status = EscrowStatus::COMPLETED;
         $escrow->save();
 

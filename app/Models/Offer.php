@@ -6,6 +6,7 @@ use App\Enums\Offers\OfferType;
 use App\Models\Products\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Offer extends Model
@@ -52,5 +53,10 @@ class Offer extends Model
     public function chat(): BelongsTo
     {
         return $this->belongsTo(Chat::class);
+    }
+
+    public function escrow(): HasOne
+    {
+        return $this->hasOne(Escrow::class);
     }
 }

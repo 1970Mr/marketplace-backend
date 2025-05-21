@@ -14,15 +14,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('escrow', static function (Blueprint $table) {
+        Schema::create('escrows', static function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique();
             $table->foreignId('offer_id')->constrained()->cascadeOnDelete();
             $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('admin_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->unsignedTinyInteger('current_phase')->default(EscrowPhase::SIGNATURE->value);
-            $table->unsignedTinyInteger('current_stage')->default(EscrowStage::AWAITING_SIGNATURE->value);
+            $table->unsignedTinyInteger('phase')->default(EscrowPhase::SIGNATURE->value);
+            $table->unsignedTinyInteger('stage')->default(EscrowStage::AWAITING_SIGNATURE->value);
             $table->string('buyer_signature_path')->nullable();
             $table->string('seller_signature_path')->nullable();
             $table->json('payment_receipts')->nullable();
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('escrow');
+        Schema::dropIfExists('escrows');
     }
 };

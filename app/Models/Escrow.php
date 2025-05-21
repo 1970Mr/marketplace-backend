@@ -19,8 +19,8 @@ class Escrow extends Model
         'buyer_id',
         'seller_id',
         'admin_id',
-        'current_phase',
-        'current_stage',
+        'phase',
+        'stage',
         'buyer_signature_path',
         'seller_signature_path',
         'payment_receipts',
@@ -32,8 +32,8 @@ class Escrow extends Model
     ];
 
     protected $casts = [
-        'current_phase' => EscrowPhase::class,
-        'current_stage' => EscrowStage::class,
+        'phase' => EscrowPhase::class,
+        'stage' => EscrowStage::class,
         'status' => EscrowStatus::class,
         'amount_received_method' => PaymentMethod::class,
         'amount_released_method' => PaymentMethod::class,
@@ -70,7 +70,7 @@ class Escrow extends Model
 
     public function admin(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'admin_id');
+        return $this->belongsTo(Admin::class, 'admin_id');
     }
 
     public function timeSlots(): BelongsToMany

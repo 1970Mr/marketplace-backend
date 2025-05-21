@@ -82,4 +82,9 @@ class User extends Authenticatable
                 $query->where('seller_id', $this->id);
             });
     }
+
+    public function escrows(): HasMany
+    {
+        return $this->hasMany(Escrow::class, 'buyer_id')->orWhere('seller_id', $this->id);
+    }
 }

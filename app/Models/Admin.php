@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Users\AdminStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -34,6 +35,11 @@ class Admin extends Authenticatable
             'password' => 'hashed',
             'status' => AdminStatus::class,
         ];
+    }
+
+    public function escrows(): HasMany
+    {
+        return $this->hasMany(Escrow::class, 'admin_id');
     }
 
     public function timeSlots(): BelongsToMany

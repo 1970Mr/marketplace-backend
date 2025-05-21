@@ -2,22 +2,34 @@
 
 namespace App\Services\Panel\Offers;
 
+use App\Enums\Escrow\EscrowStatus;
 use App\Enums\Messenger\MessageType;
+use App\Enums\Offers\OfferType;
 use App\Events\ChatParticipantsNotified;
 use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Offer;
 use App\Models\Products\Product;
+use App\Services\Escrow\EscrowService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\ValidationException;
 
 class OfferService
 {
-    public function getOffersForUser(Request $request, int $userId, string $userColumn = 'seller_id'): LengthAwarePaginator
+    public function __construct(readonly private EscrowService $escrowService)
+    {
+    }
+
+    public function getOffersForUser(Request $request, int $userId, string $userColumn = 'seller_id', ?OfferType $offerType = null): LengthAwarePaginator
     {
         $query = Offer::where($userColumn, $userId)
             ->with(['product', 'chat', 'buyer', 'seller']);
+
+        if ($offerType) {
+            $query->where('status', $offerType->value);
+        }
 
         $this->applySearch($query, $request);
         $this->applyFilters($query, $request);
@@ -88,9 +100,54 @@ class OfferService
         broadcast(new ChatParticipantsNotified($message));
     }
 
+    private function checkCanDeleteEscrow(Offer $offer): bool
+    {
+        if (!$offer->escrow()->exists()) {
+            return false;
+        }
+
+        if ($offer->escrow->status !== EscrowStatus::PENDING) {
+            throw ValidationException::withMessages([
+                'escrow_is_active' => 'This Offer has an active Escrow you can\'t delete it'
+            ]);
+        }
+
+        return true;
+    }
+
+    private function handleCreateEscrowWhenAcceptOffer(Offer $offer, int $status): void {
+        if ($status === OfferType::ACCEPTED->value) {
+            $this->escrowService->createEscrow([
+                'offer_id' => $offer->id,
+                'buyer_id' => $offer->buyer_id,
+                'seller_id' => $offer->seller_id,
+            ]);
+        }
+    }
+
+    private function handleDeleteEscrowWhenRejectOffer(Offer $offer, int $status): void {
+        if ($status === OfferType::REJECTED->value && $this->checkCanDeleteEscrow($offer)) {
+            $offer->escrow()->delete();
+        }
+    }
+
+    public function changeStatus(Offer $offer, int $status): Offer
+    {
+        $this->handleDeleteEscrowWhenRejectOffer($offer, $status);
+        $this->handleCreateEscrowWhenAcceptOffer($offer, $status);
+
+        $offer->update(['status' => $status]);
+        return $offer->fresh();
+    }
+
     public function deleteOffer(Offer $offer, int $buyerId): void
     {
         abort_if($offer->buyer_id !== $buyerId, 401);
+
+        if ($this->checkCanDeleteEscrow($offer)) {
+            $offer->escrow()->delete();
+        }
+
         $offer->delete();
     }
 }
