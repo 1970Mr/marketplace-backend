@@ -27,8 +27,12 @@ class Escrow extends Model
         'payment_receipts',
         'amount_received',
         'amount_released',
+        'amount_refunded',
         'amount_received_method',
         'amount_released_method',
+        'amount_refunded_method',
+        'cancellation_note',
+        'refund_reason',
         'status',
     ];
 
@@ -38,11 +42,11 @@ class Escrow extends Model
         'status' => EscrowStatus::class,
         'amount_received_method' => PaymentMethod::class,
         'amount_released_method' => PaymentMethod::class,
+        'amount_refunded_method' => PaymentMethod::class,
         'payment_receipts' => 'array',
         'amount_received' => 'decimal:2',
         'amount_released' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'amount_refunded' => 'decimal:2',
     ];
 
     protected static function boot(): void
@@ -50,7 +54,7 @@ class Escrow extends Model
         parent::boot();
 
         static::creating(static function ($model) {
-            $model->uuid = $model->uuid ?? (string) Str::uuid();
+            $model->uuid = $model->uuid ?? (string)Str::uuid();
         });
     }
 
@@ -84,11 +88,11 @@ class Escrow extends Model
         )->withTimestamps();
     }
 
-    public function scopeFilterByProductTitle($query, $search): Builder
+    public function scopeFilterByProductTitle(Builder $query, string|null $search): Builder
     {
         return $query->when($search, function ($query) use ($search) {
             $query->whereHas('offer.product', function ($q) use ($search) {
-                $q->where('title', 'like', '%'.$search.'%');
+                $q->where('title', 'like', '%' . $search . '%');
             });
         });
     }

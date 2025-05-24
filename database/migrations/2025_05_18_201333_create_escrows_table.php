@@ -28,8 +28,12 @@ return new class extends Migration
             $table->json('payment_receipts')->nullable();
             $table->decimal('amount_received', 10, 2)->nullable();
             $table->decimal('amount_released', 10, 2)->nullable();
+            $table->decimal('amount_refunded', 10, 2)->nullable();
             $table->unsignedTinyInteger('amount_received_method')->nullable();
             $table->unsignedTinyInteger('amount_released_method')->nullable();
+            $table->unsignedTinyInteger('amount_refunded_method')->nullable();
+            $table->text('cancellation_note')->nullable();
+            $table->text('refund_reason')->nullable();
             $table->unsignedTinyInteger('status')->default(EscrowStatus::PENDING->value);
             $table->timestamps();
         });

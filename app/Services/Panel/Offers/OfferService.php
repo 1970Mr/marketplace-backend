@@ -10,7 +10,7 @@ use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Offer;
 use App\Models\Products\Product;
-use App\Services\Escrow\EscrowService;
+use App\Services\Escrow\EscrowServiceTemp;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class OfferService
 {
-    public function __construct(readonly private EscrowService $escrowService)
+    public function __construct(readonly private EscrowServiceTemp $escrowService)
     {
     }
 
