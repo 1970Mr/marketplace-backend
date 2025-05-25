@@ -34,6 +34,7 @@ class EscrowResource extends JsonResource
             'phase_label' => $this->phase?->label(),
             'stage_label' => $this->stage?->label(),
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 

@@ -25,6 +25,8 @@ class SignatureService
         if ($escrow->seller_signature_path) {
             $escrow->phase = EscrowPhase::PAYMENT;
             $escrow->stage = EscrowStage::AWAITING_PAYMENT;
+        } else {
+            $escrow->stage = EscrowStage::AWAITING_SELLER_SIGNATURE;
         }
 
         $escrow->save();
@@ -47,6 +49,8 @@ class SignatureService
         if ($escrow->buyer_signature_path) {
             $escrow->phase = EscrowPhase::PAYMENT;
             $escrow->stage = EscrowStage::AWAITING_PAYMENT;
+        } else {
+            $escrow->stage = EscrowStage::AWAITING_BUYER_SIGNATURE;
         }
 
         $escrow->save();

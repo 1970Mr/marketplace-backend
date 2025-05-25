@@ -43,7 +43,7 @@ class EscrowController extends Controller
 
     public function show(Escrow $escrow): EscrowResource
     {
-        $escrow->load(['offer', 'buyer', 'seller', 'admin']);
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
         return new EscrowResource($escrow);
     }
 
@@ -56,18 +56,21 @@ class EscrowController extends Controller
     public function uploadBuyerSignature(UploadSignatureRequest $request, Escrow $escrow): EscrowResource
     {
         $escrow = $this->signatureService->uploadBuyerSignature($escrow, $request->file('file'));
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
         return new EscrowResource($escrow);
     }
 
     public function uploadSellerSignature(UploadSignatureRequest $request, Escrow $escrow): EscrowResource
     {
         $escrow = $this->signatureService->uploadSellerSignature($escrow, $request->file('file'));
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
         return new EscrowResource($escrow);
     }
 
     public function uploadReceipts(UploadReceiptsRequest $request, Escrow $escrow): EscrowResource
     {
         $escrow = $this->paymentService->uploadReceipts($escrow, $request->file('files'));
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
         return new EscrowResource($escrow);
     }
 

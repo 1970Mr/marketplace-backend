@@ -10,7 +10,7 @@ use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Offer;
 use App\Models\Products\Product;
-use App\Services\Escrow\EscrowServiceTemp;
+use App\Services\Escrow\EscrowManagementService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class OfferService
 {
-    public function __construct(readonly private EscrowServiceTemp $escrowService)
+    public function __construct(readonly private EscrowManagementService $escrowManagementService)
     {
     }
 
@@ -117,7 +117,7 @@ class OfferService
 
     private function handleCreateEscrowWhenAcceptOffer(Offer $offer, int $status): void {
         if ($status === OfferType::ACCEPTED->value) {
-            $this->escrowService->createEscrow([
+            $this->escrowManagementService->createEscrow([
                 'offer_id' => $offer->id,
                 'buyer_id' => $offer->buyer_id,
                 'seller_id' => $offer->seller_id,

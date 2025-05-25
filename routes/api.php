@@ -3,10 +3,10 @@
 use App\Http\Controllers\Api\V1\Admin\Agents\AgentController;
 use App\Http\Controllers\Api\V1\Admin\Auth\AuthController as AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\Escrow\EscrowController as AdminEscrowController;
-use App\Http\Controllers\Api\V1\Admin\Escrow\EscrowController as PanelEscrowController;
-use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
 use App\Http\Controllers\Api\V1\Admin\ProductManagement\ProductManagementController;
+use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Panel\Escrow\EscrowController as PanelEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
@@ -87,7 +87,7 @@ Route::prefix('v1')->group(function () {
         // Escrow (User)
         Route::prefix('escrows')->group(function () {
             Route::get('/', [PanelEscrowController::class, 'getUserEscrows']);
-            Route::get('{{escrow:uuid}}', [PanelEscrowController::class, 'show']);
+            Route::get('{escrow:uuid}', [PanelEscrowController::class, 'show']);
             Route::post('/', [PanelEscrowController::class, 'store']);
             Route::post('{escrow:uuid}/signatures/buyer', [PanelEscrowController::class, 'uploadBuyerSignature']);
             Route::post('{escrow:uuid}/signatures/seller', [PanelEscrowController::class, 'uploadSellerSignature']);
@@ -148,6 +148,7 @@ Route::prefix('v1')->group(function () {
 //        // Escrow (User)
 //        Route::prefix('escrows')->group(function () {
 //            Route::get('/', [PanelEscrowController::class, 'getUserEscrows']);
+//            Route::get('{escrow:uuid}', [PanelEscrowController::class, 'show']);
 //            Route::post('/', [PanelEscrowController::class, 'store']);
 //            Route::post('{escrow:uuid}/signatures/buyer', [PanelEscrowController::class, 'uploadBuyerSignature']);
 //            Route::post('{escrow:uuid}/signatures/seller', [PanelEscrowController::class, 'uploadSellerSignature']);
