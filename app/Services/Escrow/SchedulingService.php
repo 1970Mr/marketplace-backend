@@ -6,23 +6,21 @@ use App\Enums\Escrow\EscrowPhase;
 use App\Enums\Escrow\EscrowStage;
 use App\Models\Escrow;
 use App\Models\TimeSlot;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 
 class SchedulingService
 {
-    public function proposeSlots(Escrow $escrow, array $slotIds): Collection
+    public function proposeSlots(Escrow $escrow, array $slotIds): Escrow
     {
-        $slots = $this->validateAndAttachSlots($escrow, $slotIds);
+        $this->validateAndAttachSlots($escrow, $slotIds);
 
         $escrow->stage = EscrowStage::SCHEDULING_SUGGESTED;
         $escrow->save();
 
-        return $slots;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
     }
 
-    private function validateAndAttachSlots(Escrow $escrow, array $slotIds): Collection
+    private function validateAndAttachSlots(Escrow $escrow, array $slotIds): void
     {
         $validSlots = TimeSlot::where('admin_id', $escrow->admin_id)
             ->available()
@@ -36,14 +34,14 @@ class SchedulingService
         }
 
         $escrow->timeSlots()->sync($validSlots->pluck('id'));
-
-        return $validSlots;
     }
 
-    public function selectSlot(Escrow $escrow, int $slotId): TimeSlot
+    public function selectSlot(Escrow $escrow, int $slotId): Escrow
     {
         if (!$escrow->timeSlots()->where('time_slots.id', $slotId)->exists()) {
-            throw new RuntimeException('Slot not proposed for this escrow');
+            throw ValidationException::withMessages([
+                'not_proposed' => 'Slot not proposed for this escrow'
+            ]);
         }
 
         $escrow->timeSlots()->sync([$slotId]);
@@ -51,7 +49,7 @@ class SchedulingService
         $escrow->stage = EscrowStage::DELIVERY_PENDING;
         $escrow->save();
 
-        return TimeSlot::findOrFail($slotId);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
     }
 
     public function rejectScheduling(Escrow $escrow): Escrow
@@ -60,6 +58,6 @@ class SchedulingService
         $escrow->stage = EscrowStage::SCHEDULING_REJECTED;
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 }

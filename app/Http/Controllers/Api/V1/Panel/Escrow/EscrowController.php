@@ -3,12 +3,6 @@
 namespace App\Http\Controllers\Api\V1\Panel\Escrow;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
-use App\Services\Escrow\EscrowManagementService;
-use App\Services\Escrow\PaymentService;
-use App\Services\Escrow\ScheduleAvailabilityService;
-use App\Services\Escrow\SchedulingService;
-use App\Services\Escrow\SignatureService;
 use App\Http\Requests\V1\Escrow\{
     GetUserEscrowsRequest,
     ProposeSlotsRequest,
@@ -17,13 +11,15 @@ use App\Http\Requests\V1\Escrow\{
     UploadReceiptsRequest,
     UploadSignatureRequest
 };
-use App\Http\Resources\V1\Escrow\{
-    EscrowResource,
-    TimeSlotResource
-};
+use App\Http\Resources\V1\Escrow\EscrowResource;
+use App\Models\Admin;
 use App\Models\Escrow;
+use App\Services\Escrow\EscrowManagementService;
+use App\Services\Escrow\PaymentService;
+use App\Services\Escrow\ScheduleAvailabilityService;
+use App\Services\Escrow\SchedulingService;
+use App\Services\Escrow\SignatureService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 
 class EscrowController extends Controller
@@ -34,47 +30,45 @@ class EscrowController extends Controller
         readonly private PaymentService $paymentService,
         readonly private SchedulingService $schedulingService,
         readonly private ScheduleAvailabilityService $scheduleAvailabilityService
-    )
-    {
-    }
+    ) {}
 
-    public function getUserEscrows(GetUserEscrowsRequest $request): ResourceCollection
+    public function getUserEscrows(GetUserEscrowsRequest $request): JsonResponse
     {
         $escrows = $this->managementService->getUserEscrows(Auth::user(), $request->validated());
-        return EscrowResource::collection($escrows);
+        return EscrowResource::collection($escrows)->response();
     }
 
-    public function show(Escrow $escrow): EscrowResource
+    public function show(Escrow $escrow): JsonResponse
     {
-        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
-        return new EscrowResource($escrow);
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
+        return EscrowResource::make($escrow)->response();
     }
 
     public function store(StoreEscrowRequest $request): JsonResponse
     {
         $escrow = $this->managementService->createEscrow($request->validated());
-        return response()->json(new EscrowResource($escrow), 201);
+        return EscrowResource::make($escrow)->response();
     }
 
-    public function uploadBuyerSignature(UploadSignatureRequest $request, Escrow $escrow): EscrowResource
+    public function uploadBuyerSignature(UploadSignatureRequest $request, Escrow $escrow): JsonResponse
     {
         $escrow = $this->signatureService->uploadBuyerSignature($escrow, $request->file('file'));
         $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
-        return new EscrowResource($escrow);
+        return EscrowResource::make($escrow)->response();
     }
 
-    public function uploadSellerSignature(UploadSignatureRequest $request, Escrow $escrow): EscrowResource
+    public function uploadSellerSignature(UploadSignatureRequest $request, Escrow $escrow): JsonResponse
     {
         $escrow = $this->signatureService->uploadSellerSignature($escrow, $request->file('file'));
         $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
-        return new EscrowResource($escrow);
+        return EscrowResource::make($escrow)->response();
     }
 
-    public function uploadReceipts(UploadReceiptsRequest $request, Escrow $escrow): EscrowResource
+    public function uploadReceipts(UploadReceiptsRequest $request, Escrow $escrow): JsonResponse
     {
         $escrow = $this->paymentService->uploadReceipts($escrow, $request->file('files'));
         $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
-        return new EscrowResource($escrow);
+        return EscrowResource::make($escrow)->response();
     }
 
     public function getAdminAvailability(Admin $admin): JsonResponse
@@ -83,27 +77,27 @@ class EscrowController extends Controller
         return response()->json($slots);
     }
 
-    public function proposeSlots(ProposeSlotsRequest $request, Escrow $escrow): ResourceCollection
+    public function proposeSlots(ProposeSlotsRequest $request, Escrow $escrow): JsonResponse
     {
-        $slots = $this->schedulingService->proposeSlots(
+        $escrow = $this->schedulingService->proposeSlots(
             $escrow,
             $request->validated('slot_ids')
         );
-        return TimeSlotResource::collection($slots);
+        return EscrowResource::make($escrow)->response();
     }
 
-    public function selectSlot(SelectSlotRequest $request, Escrow $escrow): TimeSlotResource
+    public function selectSlot(SelectSlotRequest $request, Escrow $escrow): JsonResponse
     {
-        $slot = $this->schedulingService->selectSlot(
+        $escrow = $this->schedulingService->selectSlot(
             $escrow,
             $request->validated('slot_id')
         );
-        return new TimeSlotResource($slot);
+        return EscrowResource::make($escrow)->response();
     }
 
-    public function rejectScheduling(Escrow $escrow): EscrowResource
+    public function rejectScheduling(Escrow $escrow): JsonResponse
     {
         $escrow = $this->schedulingService->rejectScheduling($escrow);
-        return new EscrowResource($escrow);
+        return EscrowResource::make($escrow)->response();
     }
 }

@@ -56,13 +56,13 @@ class ScheduleAvailabilityService
     private function fetchAvailableSlots(Admin $admin): Collection
     {
         return TimeSlot::where('admin_id', $admin->id)
-            ->where('datetime', '>', now())
-            ->whereDoesntHave('escrows')
+            ->future()
+            ->available()
             ->orderBy('datetime')
             ->get();
     }
 
-    private function formatSlots(Collection $slots): array
+    public function formatSlots(Collection $slots): array
     {
         return $slots->groupBy(fn($slot) => $slot->datetime->format('Y-m-d'))
             ->map(function ($group, $date) {
