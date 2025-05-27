@@ -92,6 +92,8 @@ Route::prefix('v1')->group(function () {
             Route::post('{escrow:uuid}/signatures/buyer', [PanelEscrowController::class, 'uploadBuyerSignature']);
             Route::post('{escrow:uuid}/signatures/seller', [PanelEscrowController::class, 'uploadSellerSignature']);
             Route::post('{escrow:uuid}/receipts', [PanelEscrowController::class, 'uploadReceipts']);
+            Route::post('{escrow:uuid}/receipts', [PanelEscrowController::class, 'uploadReceipts']);
+            Route::get('{admin}/availability', [PanelEscrowController::class, 'getAdminAvailability']);
             Route::post('{escrow:uuid}/slots/propose', [PanelEscrowController::class, 'proposeSlots']);
             Route::post('{escrow:uuid}/slots/select', [PanelEscrowController::class, 'selectSlot']);
             Route::post('{escrow:uuid}/slots/reject', [PanelEscrowController::class, 'rejectScheduling']);

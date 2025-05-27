@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Panel\Escrow;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Services\Escrow\EscrowManagementService;
 use App\Services\Escrow\PaymentService;
+use App\Services\Escrow\ScheduleAvailabilityService;
 use App\Services\Escrow\SchedulingService;
 use App\Services\Escrow\SignatureService;
 use App\Http\Requests\V1\Escrow\{
@@ -30,7 +32,8 @@ class EscrowController extends Controller
         readonly private EscrowManagementService $managementService,
         readonly private SignatureService $signatureService,
         readonly private PaymentService $paymentService,
-        readonly private SchedulingService $schedulingService
+        readonly private SchedulingService $schedulingService,
+        readonly private ScheduleAvailabilityService $scheduleAvailabilityService
     )
     {
     }
@@ -74,12 +77,17 @@ class EscrowController extends Controller
         return new EscrowResource($escrow);
     }
 
+    public function getAdminAvailability(Admin $admin): JsonResponse
+    {
+        $slots = $this->scheduleAvailabilityService->getNextAvailableSlots($admin);
+        return response()->json($slots);
+    }
+
     public function proposeSlots(ProposeSlotsRequest $request, Escrow $escrow): ResourceCollection
     {
         $slots = $this->schedulingService->proposeSlots(
             $escrow,
-            $request->validated('weekdays'),
-            $request->validated('times')
+            $request->validated('slot_ids')
         );
         return TimeSlotResource::collection($slots);
     }

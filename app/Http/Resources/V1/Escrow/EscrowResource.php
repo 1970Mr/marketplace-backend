@@ -2,13 +2,12 @@
 
 namespace App\Http\Resources\V1\Escrow;
 
-use App\Enums\Escrow\EscrowStage;
+use App\Enums\Escrow\EscrowPhase;
 use App\Http\Resources\V1\Admin\AdminResource;
 use App\Http\Resources\V1\Offers\OfferResource;
 use App\Http\Resources\V1\Users\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use function Symfony\Component\Translation\t;
 
 class EscrowResource extends JsonResource
 {
@@ -41,7 +40,7 @@ class EscrowResource extends JsonResource
     private function getSelectedSlot(): ?string
     {
         return $this->whenLoaded('timeSlots', function (): ?string {
-            return $this->status === EscrowStage::DELIVERY_PENDING ?
+            return $this->status->value >= EscrowPhase::DELIVERY->value ?
                 TimeSlotResource::make($this->timeSlots->first()) :
                 null;
         }, null);

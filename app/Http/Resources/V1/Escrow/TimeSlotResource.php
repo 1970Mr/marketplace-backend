@@ -16,9 +16,10 @@ class TimeSlotResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'weekday' => $this->weekday->name,
-            'weekday_label' => $this->weekday->label(),
-            'start_time' => $this->start_time->format('H:i'),
+            'datetime' => $this->datetime->format('Y-m-d H:i:s'),
+            'formatted_date' => $this->datetime->format('F j'),
+            'formatted_time' => $this->datetime->format('h:i A T'),
+            'admin' => $this->whenLoaded('admin'),
         ];
     }
 }

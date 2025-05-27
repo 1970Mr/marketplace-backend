@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Middleware\TrackUserActivity;
+use App\Jobs\CleanOldTimeSlots;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,6 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             TrackUserActivity::class,
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->job(new CleanOldTimeSlots)->dailyAt('02:00');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->shouldRenderJsonWhen(function (Request $request) {

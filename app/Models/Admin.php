@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\Users\AdminStatus;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -42,17 +41,17 @@ class Admin extends Authenticatable
         return $this->hasMany(Escrow::class, 'admin_id');
     }
 
-    public function timeSlots(): BelongsToMany
+    public function timeSlots(): HasMany
     {
-        return $this->belongsToMany(TimeSlot::class, 'admin_time_slot');
+        return $this->hasMany(TimeSlot::class);
     }
 
-    public function reservedTimeSlots(): BelongsToMany
+    public function reservedTimeSlots(): HasMany
     {
         return $this->timeSlots()->whereHas('escrows');
     }
 
-    public function availableTimeSlots(): BelongsToMany
+    public function availableTimeSlots(): HasMany
     {
         return $this->timeSlots()->whereDoesntHave('escrows');
     }

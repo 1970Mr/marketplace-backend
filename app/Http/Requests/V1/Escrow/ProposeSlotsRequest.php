@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\V1\Escrow;
 
-use App\Enums\Escrow\Weekday;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ProposeSlotsRequest extends FormRequest
 {
@@ -24,10 +22,8 @@ class ProposeSlotsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'weekdays'   => ['required','array'],
-            'weekdays.*' => ['required', Rule::enum(Weekday::class)],
-            'times'      => ['required','array'],
-            'times.*'    => ['required','date_format:H:i'],
+            'slot_ids' => ['required', 'array', 'min:1'],
+            'slot_ids.*' => ['required', 'integer', 'exists:time_slots,id']
         ];
     }
 }

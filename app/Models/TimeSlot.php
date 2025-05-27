@@ -2,25 +2,25 @@
 
 namespace App\Models;
 
-use App\Enums\Escrow\Weekday;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class TimeSlot extends Model
 {
     protected $fillable = [
-        'weekday',
-        'start_time'
+        'datetime',
+        'admin_id'
     ];
 
     protected $casts = [
-        'weekday' => Weekday::class,
-        'start_time' => 'datetime:H:i',
+        'datetime' => 'datetime'
     ];
 
-    public function admins(): BelongsToMany
+    public function admin(): BelongsTo
     {
-        return $this->belongsToMany(Admin::class, 'admin_time_slot');
+        return $this->belongsTo(Admin::class);
     }
 
     public function escrows(): BelongsToMany
@@ -28,23 +28,33 @@ class TimeSlot extends Model
         return $this->belongsToMany(Escrow::class, 'escrow_time_slot');
     }
 
-    public function scopeForAdmin($q, int $adminId)
+    public function scopeForAdmin(Builder $query, int $adminId): Builder
     {
-        return $q->whereHas('admins', fn($q) => $q->where('admin_id', $adminId));
+        return $query->where('admin_id', $adminId);
     }
 
-    public function scopeReserved($q)
+    public function scopeReserved($query)
     {
-        return $q->whereHas('escrows');
+        return $query->whereHas('escrows');
     }
 
-    public function scopeReservedForAdmin($q, int $adminId)
+    public function scopeReservedForAdmin(Builder $query, int $adminId): Builder
     {
-        return $q->forAdmin($adminId)->reserved();
+        return $query->forAdmin($adminId)->reserved();
     }
 
-    public function scopeAvailableForAdmin($q, int $adminId)
+    public function scopeAvailableForAdmin(Builder $query, int $adminId): Builder
     {
-        return $q->forAdmin($adminId)->whereDoesntHave('escrows');
+        return $query->forAdmin($adminId)->whereDoesntHave('escrows');
+    }
+
+    public function scopeFuture(Builder $query): Builder
+    {
+        return $query->where('datetime', '>', now());
+    }
+
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('escrows');
     }
 }

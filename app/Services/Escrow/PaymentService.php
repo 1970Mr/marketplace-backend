@@ -7,14 +7,19 @@ use App\Enums\Escrow\EscrowStage;
 use App\Models\Escrow;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class PaymentService
 {
+    protected const RECEIPTS_LIMIT = 3;
+
     /**
      * Upload payment receipts (Phase PAYMENT, stage PAYMENT_UPLOADED)
      */
     public function uploadReceipts(Escrow $escrow, array $files): Escrow
     {
+        $this->checkReceiptsLimit($escrow);
+
         $paths = collect($files)->map(
             fn(UploadedFile $f) => $f->storeAs('receipts', Str::uuid() . '.' . $f->getClientOriginalExtension(), 'public')
         )->toArray();
@@ -24,6 +29,18 @@ class PaymentService
         $escrow->save();
 
         return $escrow;
+    }
+
+    /**
+     * Validates payment receipts count
+     */
+    protected function checkReceiptsLimit(Escrow $escrow): void
+    {
+        if (count($escrow->payment_receipts ?? []) >= self::RECEIPTS_LIMIT) {
+            throw ValidationException::withMessages([
+                'number_limit' => 'Payment receipts limit exceeded!'
+            ]);
+        }
     }
 
     /**
