@@ -111,6 +111,7 @@ Route::prefix('v1')->group(function () {
         // Agents
         Route::prefix('agents')->group(function () {
             Route::get('/', [AgentController::class, 'index']);
+            Route::get('/all', [AgentController::class, 'all']);
             Route::get('/{admin}', [AgentController::class, 'show']);
             Route::post('/', [AgentController::class, 'store']);
             Route::put('/{admin}', [AgentController::class, 'update']);
@@ -137,8 +138,9 @@ Route::prefix('v1')->group(function () {
 
         // Escrow (Admin)
         Route::prefix('escrows')->group(function () {
+            Route::get('/unassigned', [AdminEscrowController::class, 'getUnassignedEscrows']);
             Route::get('/me', [AdminEscrowController::class, 'getMyEscrows']);
-            Route::post('{escrow:uuid}/accept', [AdminEscrowController::class, 'accept']);
+            Route::post('{escrow:uuid}/assign/{admin}', [AdminEscrowController::class, 'assignAgent']);
             Route::post('{escrow:uuid}/payment/confirm', [AdminEscrowController::class, 'confirmPayment']);
             Route::post('{escrow:uuid}/delivery/confirm', [AdminEscrowController::class, 'confirmDelivery']);
             Route::post('{escrow:uuid}/payout/release', [AdminEscrowController::class, 'releaseFunds']);

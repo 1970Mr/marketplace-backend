@@ -9,9 +9,6 @@ use App\Models\Escrow;
 
 class PayoutService
 {
-    /**
-     * Admin releases funds (finalizes escrow)
-     */
     public function releaseFunds(Escrow $escrow, float $amount, int $method): Escrow
     {
         $escrow->amount_released = $amount;
@@ -24,9 +21,6 @@ class PayoutService
         return $escrow;
     }
 
-    /**
-     * Mark the escrow as REFUNDED indicating funds were returned
-     */
     public function refundEscrow(Escrow $escrow, float $amount, int $method, string $refundReason): Escrow
     {
         $escrow->amount_refunded = $amount;

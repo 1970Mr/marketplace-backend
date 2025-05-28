@@ -4,18 +4,27 @@ namespace App\Services\Admin\Agents;
 
 use App\Enums\Acl\RoleType;
 use App\Models\Admin;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 
 class AgentService
 {
-    public function getAgents(Request $request): LengthAwarePaginator
+    public function getPaginatedAgents(Request $request): LengthAwarePaginator
     {
         return Admin::with('roles')
             ->role('admin')
             ->latest()
             ->paginate($request->get('per_page', 10));
+    }
+
+    public function getAllAgents(): Collection
+    {
+        return Admin::with('roles')
+            ->role('admin')
+            ->latest()
+            ->get();
     }
 
     public function createAgent(array $data): Admin

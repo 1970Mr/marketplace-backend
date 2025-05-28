@@ -10,51 +10,52 @@ use Illuminate\Support\Str;
 
 class SignatureService
 {
-    /**
-     * Upload buyer signature at any time after active
-     */
     public function uploadBuyerSignature(Escrow $escrow, UploadedFile $file): Escrow
     {
-        $path = $file->storeAs(
-            'signatures/buyers',
-            Str::uuid() . '.' . $file->getClientOriginalExtension(),
-            'public'
-        );
-        $escrow->buyer_signature_path = $path;
+        $escrow->buyer_signature_path = $this->storeSignature($file, 'signatures/buyers');
 
-        if ($escrow->seller_signature_path) {
-            $escrow->phase = EscrowPhase::PAYMENT;
-            $escrow->stage = EscrowStage::AWAITING_PAYMENT;
-        } else {
-            $escrow->stage = EscrowStage::AWAITING_SELLER_SIGNATURE;
-        }
+        $this->updateEscrowAfterSignature(
+            $escrow,
+            EscrowStage::AWAITING_SELLER_SIGNATURE,
+            (bool)$escrow->seller_signature_path
+        );
 
         $escrow->save();
 
         return $escrow;
     }
 
-    /**
-     * Upload seller signature at any time after active
-     */
     public function uploadSellerSignature(Escrow $escrow, UploadedFile $file): Escrow
     {
-        $path = $file->storeAs(
-            'signatures/sellers',
-            Str::uuid() . '.' . $file->getClientOriginalExtension(),
-            'public'
-        );
-        $escrow->seller_signature_path = $path;
+        $escrow->seller_signature_path = $this->storeSignature($file, 'signatures/sellers');
 
-        if ($escrow->buyer_signature_path) {
-            $escrow->phase = EscrowPhase::PAYMENT;
-            $escrow->stage = EscrowStage::AWAITING_PAYMENT;
-        } else {
-            $escrow->stage = EscrowStage::AWAITING_BUYER_SIGNATURE;
-        }
+        $this->updateEscrowAfterSignature(
+            $escrow,
+            EscrowStage::AWAITING_BUYER_SIGNATURE,
+            (bool)$escrow->buyer_signature_path
+        );
 
         $escrow->save();
 
         return $escrow;
+    }
+
+    private function storeSignature(UploadedFile $file, string $path): string
+    {
+        return $file->storeAs(
+            $path,
+            Str::uuid() . '.' . $file->getClientOriginalExtension(),
+            'public'
+        );
+    }
+
+    private function updateEscrowAfterSignature(Escrow $escrow, EscrowStage $stage, bool $counterpartHasSignature): void
+    {
+        if ($counterpartHasSignature) {
+            $escrow->phase = EscrowPhase::PAYMENT;
+            $escrow->stage = EscrowStage::AWAITING_PAYMENT;
+        } else {
+            $escrow->stage = $stage;
+        }
     }
 }

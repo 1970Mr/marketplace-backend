@@ -15,9 +15,15 @@ use Illuminate\Support\Carbon;
 
 class EscrowManagementService
 {
-    /**
-     * Retrieve paginated escrows for a user or admin with optional filters
-     */
+    public function getUnassignedEscrows(Request $request): LengthAwarePaginator
+    {
+        return Escrow::with(['offer.product', 'buyer', 'seller', 'admin'])
+            ->whereNull('admin_id')
+            ->filterByProductTitle($request->get('search'))
+            ->filterByDateRange($request->get('from_date'), $request->get('to_date'))
+            ->paginate($request->get('per_page', 10));
+    }
+
     public function getMyEscrows(User|Admin $user, Request $request): LengthAwarePaginator
     {
         return $user->escrows()
@@ -29,9 +35,6 @@ class EscrowManagementService
             ->paginate($request->get('per_page', 10));
     }
 
-    /**
-     * Create new escrow in PENDING status (before admin assignment)
-     */
     public function createEscrow(array $data): Escrow
     {
         $escrow = Escrow::create([
@@ -46,10 +49,7 @@ class EscrowManagementService
         return $escrow;
     }
 
-    /**
-     * Admin accepts responsibility: change status from PENDING to ACTIVE
-     */
-    public function acceptEscrow(Escrow $escrow, int $adminId): Escrow
+    public function assignAgent(Escrow $escrow, int $adminId): Escrow
     {
         $escrow->admin_id = $adminId;
         $escrow->status = EscrowStatus::ACTIVE;
@@ -60,9 +60,6 @@ class EscrowManagementService
         return $escrow;
     }
 
-    /**
-     * Cancel the escrow and mark it as CANCELLED
-     */
     public function cancelEscrow(Escrow $escrow, string $cancellationNote): Escrow
     {
         $escrow->cancellation_note = $cancellationNote;

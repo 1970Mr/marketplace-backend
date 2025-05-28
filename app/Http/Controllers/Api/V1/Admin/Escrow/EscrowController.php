@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin\Escrow;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Http\Requests\V1\Escrow\{
     CancelEscrowRequest,
     ConfirmPaymentRequest,
@@ -28,6 +29,12 @@ class EscrowController extends Controller
         readonly private PayoutService $payoutService
     ) {}
 
+    public function getUnassignedEscrows(Request $request): ResourceCollection
+    {
+        $escrows = $this->managementService->getUnassignedEscrows($request);
+        return EscrowResource::collection($escrows);
+    }
+
     public function getMyEscrows(Request $request): ResourceCollection
     {
         $escrows = $this->managementService->getMyEscrows(Auth::guard('admin-api')->user(), $request);
@@ -40,10 +47,9 @@ class EscrowController extends Controller
         return new EscrowResource($escrow);
     }
 
-    public function accept(Escrow $escrow): EscrowResource
+    public function assignAgent(Escrow $escrow, Admin $admin): EscrowResource
     {
-        $adminId = Auth::guard('admin-api')->id();
-        $escrow = $this->managementService->acceptEscrow($escrow, $adminId);
+        $escrow = $this->managementService->assignAgent($escrow, $admin->id);
         return new EscrowResource($escrow);
     }
 

@@ -22,7 +22,13 @@ class AgentController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $admins = $this->agentService->getAgents($request);
+        $admins = $this->agentService->getPaginatedAgents($request);
+        return AdminResource::collection($admins)->response();
+    }
+
+    public function all(): JsonResponse
+    {
+        $admins = $this->agentService->getAllAgents();
         return AdminResource::collection($admins)->response();
     }
 

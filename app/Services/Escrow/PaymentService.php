@@ -13,9 +13,6 @@ class PaymentService
 {
     protected const RECEIPTS_LIMIT = 3;
 
-    /**
-     * Upload payment receipts (Phase PAYMENT, stage PAYMENT_UPLOADED)
-     */
     public function uploadReceipts(Escrow $escrow, array $files): Escrow
     {
         $this->checkReceiptsLimit($escrow);
@@ -31,10 +28,7 @@ class PaymentService
         return $escrow;
     }
 
-    /**
-     * Validates payment receipts count
-     */
-    protected function checkReceiptsLimit(Escrow $escrow): void
+    private function checkReceiptsLimit(Escrow $escrow): void
     {
         if (count($escrow->payment_receipts ?? []) >= self::RECEIPTS_LIMIT) {
             throw ValidationException::withMessages([
@@ -43,9 +37,6 @@ class PaymentService
         }
     }
 
-    /**
-     * Admin confirms payment, stores amount and method and advances scheduling
-     */
     public function confirmPayment(Escrow $escrow, float $amount, int $method): Escrow
     {
         $escrow->amount_received = $amount;

@@ -6,7 +6,7 @@ use App\Enums\Escrow\EscrowPhase;
 use App\Enums\Escrow\EscrowStage;
 use App\Enums\Escrow\EscrowStatus;
 use App\Enums\Escrow\PaymentMethod;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\Helpers\EscrowFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,6 +14,8 @@ use Illuminate\Support\Str;
 
 class Escrow extends Model
 {
+    use EscrowFilter;
+
     protected $fillable = [
         'uuid',
         'offer_id',
@@ -86,21 +88,5 @@ class Escrow extends Model
             'escrow_id',
             'time_slot_id'
         )->withTimestamps();
-    }
-
-    public function scopeFilterByProductTitle(Builder $query, string|null $search): Builder
-    {
-        return $query->when($search, function ($query) use ($search) {
-            $query->whereHas('offer.product', function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%');
-            });
-        });
-    }
-
-    public function scopeFilterBy(Builder $query, string $column, string|int|null $value): Builder
-    {
-        return $query->when($value, function ($query) use ($column, $value) {
-            $query->where($column, $value);
-        });
     }
 }
