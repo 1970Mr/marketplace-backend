@@ -9,37 +9,24 @@ use App\Jobs\ExpireEscrowJob;
 use App\Models\Admin;
 use App\Models\Escrow;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 
 class EscrowManagementService
 {
     /**
-     * Retrieve paginated escrows for an admin with optional filters
+     * Retrieve paginated escrows for a user or admin with optional filters
      */
-    public function getAdminEscrows(Admin $admin, array $filters): LengthAwarePaginator
-    {
-        return $admin->escrows()
-            ->with(['offer.product', 'buyer', 'seller', 'admin'])
-            ->filterByProductTitle($filters['search'])
-            ->filterBy('status', $filters['status'])
-            ->filterBy('phase', $filters['phase'])
-            ->filterBy('stage', $filters['stage'])
-            ->paginate($filters['per_page']);
-    }
-
-    /**
-     * Retrieve paginated escrows for a user with optional filters
-     */
-    public function getUserEscrows(User $user, array $filters): LengthAwarePaginator
+    public function getMyEscrows(User|Admin $user, Request $request): LengthAwarePaginator
     {
         return $user->escrows()
             ->with(['offer.product', 'buyer', 'seller', 'admin'])
-            ->filterByProductTitle($filters['search'])
-            ->filterBy('status', $filters['status'])
-            ->filterBy('phase', $filters['phase'])
-            ->filterBy('stage', $filters['stage'])
-            ->paginate($filters['per_page']);
+            ->filterByProductTitle($request->get('search'))
+            ->filterBy('status', $request->get('status'))
+            ->filterBy('phase', $request->get('phase'))
+            ->filterBy('stage', $request->get('stage'))
+            ->paginate($request->get('per_page', 10));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Services\Escrow;
 
+use App\Enums\Escrow\EscrowPhase;
 use App\Enums\Escrow\EscrowStage;
 use App\Enums\Escrow\EscrowStatus;
 use App\Models\Escrow;
@@ -16,6 +17,7 @@ class PayoutService
         $escrow->amount_released = $amount;
         $escrow->amount_released_method = $method;
         $escrow->stage = EscrowStage::PAYOUT_COMPLETED;
+        $escrow->phase = EscrowPhase::COMPLETED;
         $escrow->status = EscrowStatus::COMPLETED;
         $escrow->save();
 

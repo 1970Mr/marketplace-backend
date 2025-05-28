@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\V1\Admin\Escrow;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\Escrow\{CancelEscrowRequest,
+use App\Http\Requests\V1\Escrow\{
+    CancelEscrowRequest,
     ConfirmPaymentRequest,
-    GetUserEscrowsRequest,
     RefundEscrowRequest,
     ReleaseFundsRequest
 };
@@ -15,6 +15,7 @@ use App\Services\Escrow\DeliveryService;
 use App\Services\Escrow\EscrowManagementService;
 use App\Services\Escrow\PaymentService;
 use App\Services\Escrow\PayoutService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,13 +26,11 @@ class EscrowController extends Controller
         readonly private PaymentService $paymentService,
         readonly private DeliveryService $deliveryService,
         readonly private PayoutService $payoutService
-    )
-    {
-    }
+    ) {}
 
-    public function getAdminEscrows(GetUserEscrowsRequest $request): ResourceCollection
+    public function getMyEscrows(Request $request): ResourceCollection
     {
-        $escrows = $this->managementService->getAdminEscrows(Auth::guard('admin-api')->user(), $request->validated());
+        $escrows = $this->managementService->getMyEscrows(Auth::guard('admin-api')->user(), $request);
         return EscrowResource::collection($escrows);
     }
 

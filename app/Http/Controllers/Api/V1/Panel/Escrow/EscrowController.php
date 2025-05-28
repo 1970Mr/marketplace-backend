@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1\Panel\Escrow;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Escrow\{
-    GetUserEscrowsRequest,
     ProposeSlotsRequest,
     SelectSlotRequest,
     StoreEscrowRequest,
@@ -20,6 +19,7 @@ use App\Services\Escrow\ScheduleAvailabilityService;
 use App\Services\Escrow\SchedulingService;
 use App\Services\Escrow\SignatureService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EscrowController extends Controller
@@ -32,9 +32,9 @@ class EscrowController extends Controller
         readonly private ScheduleAvailabilityService $scheduleAvailabilityService
     ) {}
 
-    public function getUserEscrows(GetUserEscrowsRequest $request): JsonResponse
+    public function getMyEscrows(Request $request): JsonResponse
     {
-        $escrows = $this->managementService->getUserEscrows(Auth::user(), $request->validated());
+        $escrows = $this->managementService->getMyEscrows(Auth::user(), $request);
         return EscrowResource::collection($escrows)->response();
     }
 

@@ -86,7 +86,7 @@ Route::prefix('v1')->group(function () {
 
         // Escrow (User)
         Route::prefix('escrows')->group(function () {
-            Route::get('/', [PanelEscrowController::class, 'getUserEscrows']);
+            Route::get('/me', [PanelEscrowController::class, 'getMyEscrows']);
             Route::get('{escrow:uuid}', [PanelEscrowController::class, 'show']);
             Route::post('/', [PanelEscrowController::class, 'store']);
             Route::post('{escrow:uuid}/signatures/buyer', [PanelEscrowController::class, 'uploadBuyerSignature']);
@@ -137,7 +137,7 @@ Route::prefix('v1')->group(function () {
 
         // Escrow (Admin)
         Route::prefix('escrows')->group(function () {
-            Route::get('/', [AdminEscrowController::class, 'getAdminEscrows']);
+            Route::get('/me', [AdminEscrowController::class, 'getMyEscrows']);
             Route::post('{escrow:uuid}/accept', [AdminEscrowController::class, 'accept']);
             Route::post('{escrow:uuid}/payment/confirm', [AdminEscrowController::class, 'confirmPayment']);
             Route::post('{escrow:uuid}/delivery/confirm', [AdminEscrowController::class, 'confirmDelivery']);
@@ -145,19 +145,5 @@ Route::prefix('v1')->group(function () {
             Route::post('{escrow:uuid}/cancel', [AdminEscrowController::class, 'cancel']);
             Route::post('{escrow:uuid}/refund', [AdminEscrowController::class, 'refund']);
         });
-
-//        // Escrow (User)
-//        Route::prefix('escrows')->group(function () {
-//            Route::get('/', [PanelEscrowController::class, 'getUserEscrows']);
-//            Route::get('{escrow:uuid}', [PanelEscrowController::class, 'show']);
-//            Route::post('/', [PanelEscrowController::class, 'store']);
-//            Route::post('{escrow:uuid}/signatures/buyer', [PanelEscrowController::class, 'uploadBuyerSignature']);
-//            Route::post('{escrow:uuid}/signatures/seller', [PanelEscrowController::class, 'uploadSellerSignature']);
-//            Route::post('{escrow:uuid}/receipts', [PanelEscrowController::class, 'uploadReceipts']);
-//            Route::get('{admin}/availability', [PanelEscrowController::class, 'getAdminAvailability']);
-//            Route::post('{escrow:uuid}/slots/propose', [PanelEscrowController::class, 'proposeSlots']);
-//            Route::post('{escrow:uuid}/slots/select', [PanelEscrowController::class, 'selectSlot']);
-//            Route::post('{escrow:uuid}/slots/reject', [PanelEscrowController::class, 'rejectScheduling']);
-//        });
     });
 });

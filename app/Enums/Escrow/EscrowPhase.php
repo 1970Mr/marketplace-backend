@@ -13,4 +13,5 @@ enum EscrowPhase: int
     case SCHEDULING = 3;
     case DELIVERY = 4;
     case PAYOUT = 5;
+    case COMPLETED = 6;
 }
