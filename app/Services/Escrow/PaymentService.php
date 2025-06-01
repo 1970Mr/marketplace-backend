@@ -25,7 +25,7 @@ class PaymentService
         $escrow->stage = EscrowStage::PAYMENT_UPLOADED;
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 
     private function checkReceiptsLimit(Escrow $escrow): void
@@ -45,6 +45,6 @@ class PaymentService
         $escrow->stage = EscrowStage::AWAITING_SCHEDULING;
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 }

@@ -32,6 +32,7 @@ class EscrowManagementService
             ->filterBy('status', $request->get('status'))
             ->filterBy('phase', $request->get('phase'))
             ->filterBy('stage', $request->get('stage'))
+            ->filterByDateRange($request->get('from_date'), $request->get('to_date'))
             ->paginate($request->get('per_page', 10));
     }
 
@@ -46,7 +47,7 @@ class EscrowManagementService
 
         ExpireEscrowJob::dispatch($escrow)->delay(Carbon::now()->addDays(10));
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 
     public function assignAgent(Escrow $escrow, int $adminId): Escrow
@@ -57,7 +58,7 @@ class EscrowManagementService
         $escrow->stage = EscrowStage::AWAITING_SIGNATURE;
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 
     public function cancelEscrow(Escrow $escrow, string $cancellationNote): Escrow
@@ -66,6 +67,6 @@ class EscrowManagementService
         $escrow->status = EscrowStatus::CANCELLED;
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 }

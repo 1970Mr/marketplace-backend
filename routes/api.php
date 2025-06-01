@@ -140,6 +140,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('escrows')->group(function () {
             Route::get('/unassigned', [AdminEscrowController::class, 'getUnassignedEscrows']);
             Route::get('/me', [AdminEscrowController::class, 'getMyEscrows']);
+            Route::get('{escrow:uuid}', [PanelEscrowController::class, 'show']);
             Route::post('{escrow:uuid}/assign/{admin}', [AdminEscrowController::class, 'assignAgent']);
             Route::post('{escrow:uuid}/payment/confirm', [AdminEscrowController::class, 'confirmPayment']);
             Route::post('{escrow:uuid}/delivery/confirm', [AdminEscrowController::class, 'confirmDelivery']);

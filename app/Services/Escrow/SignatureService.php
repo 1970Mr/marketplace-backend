@@ -22,7 +22,7 @@ class SignatureService
 
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 
     public function uploadSellerSignature(Escrow $escrow, UploadedFile $file): Escrow
@@ -37,7 +37,7 @@ class SignatureService
 
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 
     private function storeSignature(UploadedFile $file, string $path): string

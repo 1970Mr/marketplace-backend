@@ -53,21 +53,18 @@ class EscrowController extends Controller
     public function uploadBuyerSignature(UploadSignatureRequest $request, Escrow $escrow): JsonResponse
     {
         $escrow = $this->signatureService->uploadBuyerSignature($escrow, $request->file('file'));
-        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
         return EscrowResource::make($escrow)->response();
     }
 
     public function uploadSellerSignature(UploadSignatureRequest $request, Escrow $escrow): JsonResponse
     {
         $escrow = $this->signatureService->uploadSellerSignature($escrow, $request->file('file'));
-        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
         return EscrowResource::make($escrow)->response();
     }
 
     public function uploadReceipts(UploadReceiptsRequest $request, Escrow $escrow): JsonResponse
     {
         $escrow = $this->paymentService->uploadReceipts($escrow, $request->file('files'));
-        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
         return EscrowResource::make($escrow)->response();
     }
 

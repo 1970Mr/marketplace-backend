@@ -18,7 +18,7 @@ class PayoutService
         $escrow->status = EscrowStatus::COMPLETED;
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 
     public function refundEscrow(Escrow $escrow, float $amount, int $method, string $refundReason): Escrow
@@ -29,6 +29,6 @@ class PayoutService
         $escrow->status = EscrowStatus::REFUNDED;
         $escrow->save();
 
-        return $escrow;
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 }
