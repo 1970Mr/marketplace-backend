@@ -6,10 +6,12 @@ use App\Enums\Escrow\EscrowPhase;
 use App\Enums\Escrow\EscrowStage;
 use App\Enums\Escrow\EscrowStatus;
 use App\Enums\Escrow\PaymentMethod;
+use App\Enums\Messenger\ChatType;
 use App\Traits\Helpers\EscrowFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Escrow extends Model
@@ -88,5 +90,15 @@ class Escrow extends Model
             'escrow_id',
             'time_slot_id'
         )->withTimestamps();
+    }
+
+    public function buyerChat(): HasOne
+    {
+        return $this->hasOne(Chat::class, 'escrow_id')->where('type', ChatType::ESCROW_BUYER);
+    }
+
+    public function sellerChat(): HasOne
+    {
+        return $this->hasOne(Chat::class, 'escrow_id')->where('type', ChatType::ESCROW_SELLER);
     }
 }

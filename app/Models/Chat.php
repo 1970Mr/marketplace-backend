@@ -18,6 +18,8 @@ class Chat extends Model
         'product_id',
         'buyer_id',
         'seller_id',
+        'admin_id',
+        'escrow_id',
     ];
 
     protected $casts = [
@@ -60,13 +62,29 @@ class Chat extends Model
 
     public function unreadMessages(): HasMany
     {
+        $senderId = auth()->id() ?? auth('admin-api')->id();
         return $this->hasMany(Message::class)
             ->whereNull('read_at')
-            ->whereNot('user_id', auth()->id());
+            ->whereNot('sender_id', $senderId);
     }
 
     public function offers(): HasMany
     {
         return $this->hasMany(Offer::class);
+    }
+
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class);
+    }
+
+    public function escrow(): BelongsTo
+    {
+        return $this->belongsTo(Escrow::class);
+    }
+
+    public function scopeIsEscrow(): bool
+    {
+        return in_array($this->type, [ChatType::ESCROW_BUYER, ChatType::ESCROW_SELLER], true);
     }
 }

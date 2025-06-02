@@ -3,6 +3,8 @@
 namespace App\Http\Resources\V1\Messenger;
 
 use App\Enums\Messenger\ChatType;
+use App\Http\Resources\V1\Admin\AdminResource;
+use App\Http\Resources\V1\Escrow\EscrowResource;
 use App\Http\Resources\V1\Products\ProductResource;
 use App\Http\Resources\V1\Users\UserResource;
 use Illuminate\Http\Request;
@@ -25,6 +27,9 @@ class ChatResource extends JsonResource
             'seller' => UserResource::make($this->whenLoaded('seller')),
             'last_message' => MessageResource::make($this->whenLoaded('lastMessage')),
             'unread_count' => $this->whenCounted('unreadMessages'),
+            'is_escrow' => $this->isEscrow(),
+            'admin' => AdminResource::make($this->whenLoaded('admin')),
+            'escrow' => EscrowResource::make($this->whenLoaded('escrow')),
         ];
     }
 }

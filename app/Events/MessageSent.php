@@ -6,6 +6,7 @@ use App\Http\Resources\V1\Messenger\MessageResource;
 use App\Models\Message;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -37,7 +38,7 @@ class MessageSent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'message' => MessageResource::make($this->message->load(['user', 'offer']))
+            'message' => MessageResource::make($this->message->load(['sender', 'offer']))
         ];
     }
 }

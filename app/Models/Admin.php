@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Users\AdminStatus;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -54,5 +55,10 @@ class Admin extends Authenticatable
     public function availableTimeSlots(): HasMany
     {
         return $this->timeSlots()->whereDoesntHave('escrows');
+    }
+
+    public function messages(): MorphMany
+    {
+        return $this->morphMany(Message::class, 'sender');
     }
 }

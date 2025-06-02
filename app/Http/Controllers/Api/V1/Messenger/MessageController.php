@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Panel\Messenger;
+namespace App\Http\Controllers\Api\V1\Messenger;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Messenger\MessageRequest;
 use App\Http\Resources\V1\Messenger\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
-use App\Services\Panel\Messenger\MessageService;
+use App\Services\Messenger\MessageService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -31,7 +31,7 @@ class MessageController extends Controller
             $request->get('content')
         );
 
-        return MessageResource::make($message->fresh(['sender', 'offer']));
+        return MessageResource::make($message->fresh(['user', 'offer']));
     }
 
     public function markAsRead(Message $message): Response

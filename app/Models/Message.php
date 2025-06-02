@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Messenger\MessageType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Str;
 
 class Message extends Model
@@ -14,7 +15,8 @@ class Message extends Model
         'content',
         'type',
         'chat_id',
-        'user_id',
+        'sender_type',
+        'sender_id',
         'offer_id',
         'read_at',
     ];
@@ -38,9 +40,9 @@ class Message extends Model
         return $this->belongsTo(Chat::class);
     }
 
-    public function user(): BelongsTo
+    public function sender(): MorphTo
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
     public function offer(): BelongsTo

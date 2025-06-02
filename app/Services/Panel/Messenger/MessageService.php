@@ -2,10 +2,12 @@
 
 namespace App\Services\Panel\Messenger;
 
+use App\Enums\Messenger\ChatType;
 use App\Events\ChatParticipantsNotified;
 use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
 
@@ -13,7 +15,7 @@ class MessageService
 {
     public function getChatMessages(Chat $chat): Collection
     {
-        return $chat->messages()->with(['user', 'offer'])->get();
+        return $chat->messages()->with(['sender', 'offer'])->get();
     }
 
     public function createMessage(string $chatUuid, int $userId, string $content): Message {
@@ -23,7 +25,8 @@ class MessageService
         $this->ensureChatIsActiveForBuyer($chat, $userId);
 
         $message = $chat->messages()->create([
-            'user_id' => $userId,
+            'sender_type' => User::class,
+            'sender_id' => $userId,
             'content' => $content,
         ]);
 
@@ -53,7 +56,7 @@ class MessageService
 
     public function markMessageAsRead(Message $message, int $currentUserId): void
     {
-        if (!$message->read_at && $message->user_id !== $currentUserId) {
+        if (!$message->read_at && $message->sender_id !== $currentUserId && $message->chat->type === ChatType::USER_TO_USER) {
             $message->update(['read_at' => now()]);
         }
     }
