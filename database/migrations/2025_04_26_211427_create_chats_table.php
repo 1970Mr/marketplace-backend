@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('admin_id')->nullable()->constrained('admins')->cascadeOnDelete();
-            $table->foreignId('escrow_id')->nullable()->constrained('escrows')->cascadeOnDelete();
+            $table->foreignId('admin_id')->nullable();
+            $table->foreignId('escrow_id')->nullable();
             $table->timestamps();
         });
     }

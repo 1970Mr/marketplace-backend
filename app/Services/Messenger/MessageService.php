@@ -18,9 +18,9 @@ class MessageService
         return $chat->messages()->with(['sender', 'offer'])->get();
     }
 
-    public function sendEscrowMessage(Escrow $escrow, ChatType $type, User|Admin $sender, string $content): Message
+    public function sendEscrowMessage(string $chatUuid, int $type, User|Admin $sender, string $content): Message
     {
-        $chat = app(ChatService::class)->findOrCreateEscrowChat($escrow, $type);
+        $chat = Chat::where('uuid', $chatUuid)->firstOrFail();
 
         $message = new Message([
             'content' => $content,

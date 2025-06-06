@@ -8,7 +8,9 @@ use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Panel\Escrow\EscrowController as PanelEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
+use App\Http\Controllers\Api\V1\Messenger\ChatController as EscrowChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
+use App\Http\Controllers\Api\V1\Messenger\MessageController as EscrowMessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
 use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProductController;
 use App\Http\Controllers\Api\V1\Panel\WatchList\WatchListController;
@@ -147,6 +149,25 @@ Route::prefix('v1')->group(function () {
             Route::post('{escrow:uuid}/payout/release', [AdminEscrowController::class, 'releaseFunds']);
             Route::post('{escrow:uuid}/cancel', [AdminEscrowController::class, 'cancel']);
             Route::post('{escrow:uuid}/refund', [AdminEscrowController::class, 'refund']);
+        });
+    });
+
+    // Escrow Messenger
+    Route::prefix('escrows')->group(function () {
+        // Chats
+        Route::prefix('chats')->group(function () {
+            Route::post('/{escrow:uuid}/find-or-create', [EscrowChatController::class, 'findOrCreateEscrowChat']);
+
+            // Chat Messages
+            Route::prefix('/{chat:uuid}/messages')->group(function () {
+                Route::get('/', [EscrowMessageController::class, 'index']);
+            });
+        });
+
+        // Messages
+        Route::prefix('messages')->group(function () {
+            Route::post('/', [EscrowMessageController::class, 'store']);
+            Route::patch('/{message:uuid}/read', [EscrowMessageController::class, 'markAsRead']);
         });
     });
 });

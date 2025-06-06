@@ -10,6 +10,7 @@ use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Offer;
 use App\Models\Products\Product;
+use App\Models\User;
 use App\Services\Escrow\EscrowManagementService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -92,11 +93,12 @@ class OfferService
         $message = $chat->messages()->create([
             'content' => 'New offer submitted',
             'type' => MessageType::OFFER,
-            'user_id' => $buyerId,
+            'sender_id' => $buyerId,
+            'sender_type' => User::class,
             'offer_id' => $offerId,
         ]);
 
-        broadcast(new MessageSent($message->fresh(['user', 'offer'])))->toOthers();
+        broadcast(new MessageSent($message->fresh(['sender', 'offer'])))->toOthers();
         broadcast(new ChatParticipantsNotified($message));
     }
 
