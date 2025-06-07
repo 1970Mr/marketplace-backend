@@ -27,11 +27,11 @@ class EscrowResource extends JsonResource
             'time_slots' => TimeSlotResource::collection($this->whenLoaded('timeSlots')),
             'selected_time_slot' => $this->getSelectedSlot(),
             'status' => $this->status->value,
-            'phase' => $this->phase?->value,
-            'stage' => $this->stage?->value,
+            'phase' => $this->phase->value,
+            'stage' => $this->stage->value,
             'status_label' => $this->status->label(),
-            'phase_label' => $this->phase?->label(),
-            'stage_label' => $this->stage?->label(),
+            'phase_label' => $this->phase->label(),
+            'stage_label' => $this->stage->label(),
             'buyer_signature_url' => $this->when(
                 $this->buyer_signature_path,
                 asset('storage/' . $this->buyer_signature_path)

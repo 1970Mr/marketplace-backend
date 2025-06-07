@@ -17,6 +17,6 @@ class ChatController extends Controller
     public function findOrCreateEscrowChat(Escrow $escrow, EscrowChatRequest $request): ChatResource
     {
         $chat = $this->chatService->findOrCreateEscrowChat($escrow, $request->get('chat_type'));
-        return ChatResource::make($chat->fresh(['product', 'buyer', 'seller']));
+        return ChatResource::make($chat->fresh(['escrow', 'admin', 'buyer', 'seller']));
     }
 }

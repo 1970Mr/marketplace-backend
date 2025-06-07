@@ -24,7 +24,7 @@ class EscrowChatRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'chat_type' => [Rule::enum(ChatType::class)]
+            'chat_type' => ['required', Rule::enum(ChatType::class)]
         ];
     }
 }

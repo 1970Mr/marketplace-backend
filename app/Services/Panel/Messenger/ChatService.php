@@ -15,6 +15,7 @@ class ChatService
                 $query->where('buyer_id', $userId)
                     ->orWhere('seller_id', $userId);
             })
+            ->whereNull('escrow_id')
             ->withCount('unreadMessages')
             ->get()
             ->sortByDesc(fn($chat) => optional($chat->lastMessage)->created_at)

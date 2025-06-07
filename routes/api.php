@@ -153,7 +153,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Escrow Messenger
-    Route::prefix('escrows')->group(function () {
+    Route::prefix('escrows')->middleware('auth:sanctum,admin-api')->group(function () {
         // Chats
         Route::prefix('chats')->group(function () {
             Route::post('/{escrow:uuid}/find-or-create', [EscrowChatController::class, 'findOrCreateEscrowChat']);
@@ -166,6 +166,7 @@ Route::prefix('v1')->group(function () {
 
         // Messages
         Route::prefix('messages')->group(function () {
+            Route::post('/', [EscrowMessageController::class, 'store']);
             Route::post('/', [EscrowMessageController::class, 'store']);
             Route::patch('/{message:uuid}/read', [EscrowMessageController::class, 'markAsRead']);
         });

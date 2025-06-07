@@ -6,7 +6,6 @@ use App\Enums\Messenger\ChatType;
 use App\Events\EscrowMessageSent;
 use App\Models\Admin;
 use App\Models\Chat;
-use App\Models\Escrow;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,7 +17,7 @@ class MessageService
         return $chat->messages()->with(['sender', 'offer'])->get();
     }
 
-    public function sendEscrowMessage(string $chatUuid, int $type, User|Admin $sender, string $content): Message
+    public function sendEscrowMessage(string $chatUuid, string $content, User|Admin $sender): Message
     {
         $chat = Chat::where('uuid', $chatUuid)->firstOrFail();
 
@@ -30,7 +29,7 @@ class MessageService
 
         $chat->messages()->save($message);
 
-        broadcast(new EscrowMessageSent($message, $type))->toOthers();
+        broadcast(new EscrowMessageSent($message, $chat->type))->toOthers();
 
         return $message;
     }

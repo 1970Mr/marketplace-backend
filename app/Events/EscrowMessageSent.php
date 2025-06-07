@@ -18,7 +18,7 @@ class EscrowMessageSent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(readonly public Message $message, readonly public int $chatType)
+    public function __construct(readonly public Message $message, readonly public ChatType $chatType)
     {
         //
     }
@@ -31,7 +31,7 @@ class EscrowMessageSent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel("escrow.chat.{$this->chatType}.{$this->message->chat->escrow_id}"),
+            new PresenceChannel("escrow.chat.{$this->chatType->value}.{$this->message->chat->escrow_id}"),
         ];
     }
 

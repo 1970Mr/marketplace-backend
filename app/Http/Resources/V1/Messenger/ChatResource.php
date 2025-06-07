@@ -21,7 +21,8 @@ class ChatResource extends JsonResource
     {
         return [
             'uuid' => $this->uuid,
-            'type' => ChatType::getLabelByValue($this->type->value),
+            'type' => $this->type->value,
+            'type_label' => ChatType::getLabelByValue($this->type->value),
             'product' => ProductResource::make($this->whenLoaded('product')),
             'buyer' => UserResource::make($this->whenLoaded('buyer')),
             'seller' => UserResource::make($this->whenLoaded('seller')),

@@ -9,6 +9,6 @@ enum ChatType: int
     use EnumHelper;
 
     case USER_TO_USER = 1;
-    case ESCROW_BUYER = 2;
-    case ESCROW_SELLER = 3;
+    case ESCROW_SELLER = 2;
+    case ESCROW_BUYER = 3;
 }
