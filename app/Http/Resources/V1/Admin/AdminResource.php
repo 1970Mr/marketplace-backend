@@ -20,6 +20,7 @@ class AdminResource extends JsonResource
             'email' => $this->email,
             'avatar' => $this->getAvatarUrl(),
             'status' => $this->status->label(),
+            'type' => 'admin',
             'created_at' => $this->created_at,
             'role' => $this->getAdminRole(),
             'permissions' => $this->getAdminPermissions(),

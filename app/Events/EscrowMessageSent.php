@@ -31,7 +31,7 @@ class EscrowMessageSent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel("escrow.chat.{$this->chatType->value}.{$this->message->chat->escrow_id}"),
+            new PresenceChannel("escrow.chat.{$this->chatType->value}.{$this->message->chat->escrow->uuid}"),
         ];
     }
 

@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'note' => $this->note,
             'last_activity_at' => $this->last_activity_at?->diffForHumans(),
             'status' => $this->status->label(),
+            'type' => 'user',
             'created_at' => $this->created_at,
         ];
     }
