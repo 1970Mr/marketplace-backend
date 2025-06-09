@@ -18,6 +18,8 @@ class PayoutService
         $escrow->status = EscrowStatus::COMPLETED;
         $escrow->save();
 
+        $escrow->offer->product->update(['is_sold' => true]);
+
         return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
     }
 

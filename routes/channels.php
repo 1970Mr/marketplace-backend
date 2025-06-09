@@ -24,29 +24,20 @@ Broadcast::channel('chat.{chatUuid}', static function ($user, $chatUuid) {
 });
 
 Broadcast::channel('escrow.chat.{type}.{escrowUuid}', static function ($user, $type, $escrowUuid) {
+    $type = (int)$type;
     $escrow = Escrow::where('uuid', $escrowUuid)->firstOrFail();
 
-    // Determine role and validate membership
-    $role = null;
-    if ($user instanceof User) {
-        if ((int)$type === ChatType::ESCROW_BUYER->value && $user->id === $escrow->buyer_id) {
-            $role = 'user';
-        } elseif ((int)$type === ChatType::ESCROW_SELLER->value && $user->id === $escrow->seller_id) {
-            $role = 'user';
-        }
-    } elseif ($user instanceof Admin && $user->id === $escrow->admin_id) {
-        $role = 'admin';
-    }
+    $isBuyer = $user instanceof User && $type === ChatType::ESCROW_BUYER->value && $user->id === $escrow->buyer_id;
+    $isSeller = $user instanceof User && $type === ChatType::ESCROW_SELLER->value && $user->id === $escrow->seller_id;
+    $isAdmin = $user instanceof Admin && $user->id === $escrow->admin_id;
 
-    if (!$role) {
+    if (!$isBuyer && !$isSeller && !$isAdmin) {
         return false;
     }
 
-    // Prefix the ID so 'user:1' and 'admin:1' never collide
-    $prefixedId = "{$role}:{$user->id}";
-
+    $role = $isAdmin ? 'admin' : 'user';
     return [
-        'id' => $prefixedId,
+        'id' => "{$role}:{$user->id}",
         'type' => $role,
         'name' => $user->name,
     ];
