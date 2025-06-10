@@ -17,6 +17,6 @@ class DeliveryService
         $escrow->stage = EscrowStage::AWAITING_PAYOUT;
         $escrow->save();
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
     }
 }

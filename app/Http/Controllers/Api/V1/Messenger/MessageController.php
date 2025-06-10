@@ -37,7 +37,15 @@ class MessageController extends Controller
 
     public function markAsRead(Message $message): Response
     {
-        $this->messageService->markMessageAsRead($message, auth()->id());
+        $user = auth()->user() ?? auth()->guard('admin-api')->user();
+        $this->messageService->markAsRead($message, $user);
+        return response()->noContent();
+    }
+
+    public function markAllAsRead(Chat $chat): Response
+    {
+        $user = auth()->user() ?? auth()->guard('admin-api')->user();
+        $this->messageService->markAllAsRead($chat, $user);
         return response()->noContent();
     }
 }

@@ -55,6 +55,7 @@ class EscrowResource extends JsonResource
             'amount_refunded_method_label' => $this->amount_refunded_method?->label(),
             'cancellation_note' => $this->cancellation_note,
             'refund_reason' => $this->refund_reason,
+            'has_unread_messages' => $this->hasUnreadMessages(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
@@ -63,9 +64,28 @@ class EscrowResource extends JsonResource
     private function getSelectedSlot(): ?TimeSlotResource
     {
         return $this->whenLoaded('timeSlots', function (): ?TimeSlotResource {
-            return $this->status->value >= EscrowPhase::DELIVERY->value ?
+            return $this->phase->value >= EscrowPhase::DELIVERY->value ?
                 TimeSlotResource::make($this->timeSlots->first()) :
                 null;
         }, null);
+    }
+
+    private function hasUnreadMessages(): bool
+    {
+        if (!$this->relationLoaded('buyerChat') || !$this->relationLoaded('sellerChat')) {
+            return false;
+        }
+
+        $senderId = auth()->id() ?? auth('admin-api')->id();
+
+        $buyerUnread = $this->buyerChat && $this->buyerChat->relationLoaded('messages')
+            ? $this->buyerChat->messages->where('read_at', null)->where('sender_id', '!=', $senderId)->count() > 0
+            : false;
+
+        $sellerUnread = $this->sellerChat && $this->sellerChat->relationLoaded('messages')
+            ? $this->sellerChat->messages->where('read_at', null)->where('sender_id', '!=', $senderId)->count() > 0
+            : false;
+
+        return $buyerUnread || $sellerUnread;
     }
 }

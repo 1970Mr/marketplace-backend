@@ -2,8 +2,10 @@
 
 namespace App\Traits\Helpers;
 
+use App\Enums\Escrow\EscrowPhase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 trait EscrowFilter
 {
@@ -36,5 +38,31 @@ trait EscrowFilter
                 $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
             }
         });
+    }
+
+    public function scopeHasUnreadMessages(Builder $query, bool $needResponse = false): Builder
+    {
+        if (!$needResponse) {
+            return $query;
+        }
+
+        $senderId = auth()->id() ?? auth('admin-api')->id();
+        return $query->whereHas('buyerChat.messages', function ($query) use ($senderId) {
+            $query->whereNull('read_at')
+                ->whereNot('sender_id', $senderId);
+        })->orWhereHas('sellerChat.messages', function ($query) use ($senderId) {
+            $query->whereNull('read_at')
+                ->whereNot('sender_id', $senderId);
+        });
+    }
+
+    public function scopeInDeliveryWithTimeSlot(Builder $query, bool $inDelivery = false): Builder
+    {
+        if (!$inDelivery) {
+            return $query;
+        }
+
+        return $query->where('phase', EscrowPhase::DELIVERY)
+            ->whereHas('timeSlots');
     }
 }

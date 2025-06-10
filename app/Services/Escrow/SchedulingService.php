@@ -58,6 +58,6 @@ class SchedulingService
         $escrow->stage = EscrowStage::SCHEDULING_REJECTED;
         $escrow->save();
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
     }
 }

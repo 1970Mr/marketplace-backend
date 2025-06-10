@@ -17,22 +17,26 @@ class EscrowManagementService
 {
     public function getUnassignedEscrows(Request $request): LengthAwarePaginator
     {
-        return Escrow::with(['offer.product', 'buyer', 'seller', 'admin'])
+        return Escrow::with(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots'])
             ->whereNull('admin_id')
             ->filterByProductTitle($request->get('search'))
             ->filterByDateRange($request->get('from_date'), $request->get('to_date'))
+            ->latest()
             ->paginate($request->get('per_page', 10));
     }
 
     public function getMyEscrows(User|Admin $user, Request $request): LengthAwarePaginator
     {
         return $user->escrows()
-            ->with(['offer.product', 'buyer', 'seller', 'admin'])
+            ->with(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots'])
             ->filterByProductTitle($request->get('search'))
             ->filterBy('status', $request->get('status'))
             ->filterBy('phase', $request->get('phase'))
             ->filterBy('stage', $request->get('stage'))
             ->filterByDateRange($request->get('from_date'), $request->get('to_date'))
+            ->hasUnreadMessages((bool)$request->get('need_response', false))
+            ->inDeliveryWithTimeSlot((bool)$request->get('in_delivery', false))
+            ->latest()
             ->paginate($request->get('per_page', 10));
     }
 
@@ -47,7 +51,7 @@ class EscrowManagementService
 
         ExpireEscrowJob::dispatch($escrow)->delay(Carbon::now()->addDays(10));
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
     }
 
     public function assignAgent(Escrow $escrow, int $adminId): Escrow
@@ -58,7 +62,7 @@ class EscrowManagementService
         $escrow->stage = EscrowStage::AWAITING_SIGNATURE;
         $escrow->save();
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
     }
 
     public function cancelEscrow(Escrow $escrow, string $cancellationNote): Escrow
@@ -67,6 +71,6 @@ class EscrowManagementService
         $escrow->status = EscrowStatus::CANCELLED;
         $escrow->save();
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
     }
 }

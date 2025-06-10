@@ -169,6 +169,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [EscrowMessageController::class, 'store']);
             Route::post('/', [EscrowMessageController::class, 'store']);
             Route::patch('/{message:uuid}/read', [EscrowMessageController::class, 'markAsRead']);
+            Route::patch('/{chat:uuid}/read-all', [EscrowMessageController::class, 'markAllAsRead']);
         });
     });
 });

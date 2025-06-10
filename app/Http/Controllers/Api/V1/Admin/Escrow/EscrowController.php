@@ -43,7 +43,7 @@ class EscrowController extends Controller
 
     public function show(Escrow $escrow): EscrowResource
     {
-        $escrow->load(['offer.product', 'buyer', 'seller', 'admin']);
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
         return new EscrowResource($escrow);
     }
 
