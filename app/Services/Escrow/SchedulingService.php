@@ -14,10 +14,9 @@ class SchedulingService
     {
         $this->validateAndAttachSlots($escrow, $slotIds);
 
-        $escrow->stage = EscrowStage::SCHEDULING_SUGGESTED;
-        $escrow->save();
+        $escrow->adminEscrow->update(['stage' => EscrowStage::SCHEDULING_SUGGESTED]);
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
     }
 
     private function validateAndAttachSlots(Escrow $escrow, array $slotIds): void
@@ -45,19 +44,19 @@ class SchedulingService
         }
 
         $escrow->timeSlots()->sync([$slotId]);
-        $escrow->phase = EscrowPhase::DELIVERY;
-        $escrow->stage = EscrowStage::DELIVERY_PENDING;
-        $escrow->save();
+        $escrow->adminEscrow->update([
+            'phase' => EscrowPhase::DELIVERY,
+            'stage' => EscrowStage::DELIVERY_PENDING,
+        ]);
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
     }
 
     public function rejectScheduling(Escrow $escrow): Escrow
     {
         $escrow->timeSlots()->detach();
-        $escrow->stage = EscrowStage::SCHEDULING_REJECTED;
-        $escrow->save();
+        $escrow->adminEscrow->update(['stage' => EscrowStage::SCHEDULING_REJECTED]);
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Requests\V1\Escrow\{
     UploadSignatureRequest
 };
 use App\Http\Resources\V1\Escrow\EscrowResource;
+use App\Http\Resources\V1\Escrow\UnifiedEscrowResource;
 use App\Models\Admin;
 use App\Models\Escrow;
 use App\Services\Escrow\EscrowManagementService;
@@ -18,6 +19,7 @@ use App\Services\Escrow\PaymentService;
 use App\Services\Escrow\ScheduleAvailabilityService;
 use App\Services\Escrow\SchedulingService;
 use App\Services\Escrow\SignatureService;
+use App\Services\Escrow\UnifiedEscrowService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,18 +31,19 @@ class EscrowController extends Controller
         readonly private SignatureService $signatureService,
         readonly private PaymentService $paymentService,
         readonly private SchedulingService $schedulingService,
-        readonly private ScheduleAvailabilityService $scheduleAvailabilityService
+        readonly private ScheduleAvailabilityService $scheduleAvailabilityService,
+        readonly private UnifiedEscrowService $unifiedEscrowService
     ) {}
 
     public function getMyEscrows(Request $request): JsonResponse
     {
-        $escrows = $this->managementService->getMyEscrows(Auth::user(), $request);
-        return EscrowResource::collection($escrows)->response();
+        $escrows = $this->unifiedEscrowService->getMyEscrows(Auth::user(), $request);
+        return UnifiedEscrowResource::collection($escrows)->response();
     }
 
     public function show(Escrow $escrow): JsonResponse
     {
-        $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
         return EscrowResource::make($escrow)->response();
     }
 

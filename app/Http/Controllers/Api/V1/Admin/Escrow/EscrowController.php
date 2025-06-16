@@ -8,14 +8,13 @@ use App\Http\Requests\V1\Escrow\{
     CancelEscrowRequest,
     ConfirmPaymentRequest,
     RefundEscrowRequest,
-    ReleaseFundsRequest
+    CompleteEscrowRequest
 };
 use App\Http\Resources\V1\Escrow\EscrowResource;
 use App\Models\Escrow;
 use App\Services\Escrow\DeliveryService;
 use App\Services\Escrow\EscrowManagementService;
 use App\Services\Escrow\PaymentService;
-use App\Services\Escrow\PayoutService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
@@ -25,8 +24,7 @@ class EscrowController extends Controller
     public function __construct(
         readonly private EscrowManagementService $managementService,
         readonly private PaymentService $paymentService,
-        readonly private DeliveryService $deliveryService,
-        readonly private PayoutService $payoutService
+        readonly private DeliveryService $deliveryService
     ) {}
 
     public function getUnassignedEscrows(Request $request): ResourceCollection
@@ -43,7 +41,7 @@ class EscrowController extends Controller
 
     public function show(Escrow $escrow): EscrowResource
     {
-        $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
+        $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
         return new EscrowResource($escrow);
     }
 
@@ -69,9 +67,9 @@ class EscrowController extends Controller
         return new EscrowResource($escrow);
     }
 
-    public function releaseFunds(ReleaseFundsRequest $request, Escrow $escrow): EscrowResource
+    public function complete(CompleteEscrowRequest $request, Escrow $escrow): EscrowResource
     {
-        $escrow = $this->payoutService->releaseFunds(
+        $escrow = $this->managementService->completeEscrow(
             $escrow,
             $request->validated('amount'),
             $request->validated('method')
@@ -87,7 +85,7 @@ class EscrowController extends Controller
 
     public function refund(Escrow $escrow, RefundEscrowRequest $request): EscrowResource
     {
-        $escrow = $this->payoutService->refundEscrow(
+        $escrow = $this->managementService->refundEscrow(
             $escrow,
             $request->get('amount'),
             $request->get('method'),

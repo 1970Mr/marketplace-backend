@@ -2,6 +2,7 @@
 
 namespace App\Models\Products;
 
+use App\Enums\Escrow\EscrowType;
 use App\Enums\Products\ProductStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,6 +32,7 @@ class Product extends Model
         'is_sold',
         'is_completed',
         'is_sponsored',
+        'escrow_type',
         'status',
         'user_id',
         'productable_type',
@@ -44,6 +46,7 @@ class Product extends Model
         'is_sold' => 'boolean',
         'is_completed' => 'boolean',
         'is_sponsored' => 'boolean',
+        'escrow_type' => EscrowType::class,
         'status' => ProductStatus::class,
         'price' => 'decimal:2',
     ];

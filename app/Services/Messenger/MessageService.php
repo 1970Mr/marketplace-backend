@@ -2,18 +2,21 @@
 
 namespace App\Services\Messenger;
 
-use App\Enums\Messenger\ChatType;
 use App\Events\EscrowMessageSent;
 use App\Models\Admin;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class MessageService
 {
     public function getChatMessages(Chat $chat): Collection
     {
+        /* @var User|Admin $user */
+        $user = Auth::user() ?? Auth::guard('admin-api')->user();
+        $this->markAllAsRead($chat, $user);
         return $chat->messages()->with(['sender', 'offer'])->get();
     }
 

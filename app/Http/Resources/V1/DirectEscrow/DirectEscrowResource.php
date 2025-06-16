@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Resources\V1\Escrow;
+namespace App\Http\Resources\V1\DirectEscrow;
 
-use App\Enums\Escrow\EscrowPhase;
 use App\Http\Resources\V1\Admin\AdminResource;
+use App\Http\Resources\V1\Messenger\ChatResource;
 use App\Http\Resources\V1\Offers\OfferResource;
 use App\Http\Resources\V1\Users\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class EscrowResource extends JsonResource
+class DirectEscrowResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,7 +18,7 @@ class EscrowResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $adminEscrow = $this->adminEscrow;
+        $directEscrow = $this->directEscrow;
 
         return [
             'uuid' => $this->uuid,
@@ -27,14 +27,17 @@ class EscrowResource extends JsonResource
             'buyer' => UserResource::make($this->whenLoaded('buyer')),
             'seller' => UserResource::make($this->whenLoaded('seller')),
             'admin' => AdminResource::make($this->whenLoaded('admin')),
-            'time_slots' => TimeSlotResource::collection($this->whenLoaded('timeSlots')),
-            'selected_time_slot' => $this->getSelectedSlot(),
-            'status' => $adminEscrow?->status?->value,
-            'phase' => $adminEscrow?->phase?->value,
-            'stage' => $adminEscrow?->stage?->value,
-            'status_label' => $adminEscrow?->status?->label(),
-            'phase_label' => $adminEscrow?->phase?->label(),
-            'stage_label' => $adminEscrow?->stage?->label(),
+            'direct_chat' => ChatResource::make($this->whenLoaded('directChat')),
+
+            // Direct Escrow specific fields
+            'status' => $directEscrow?->status?->value,
+            'phase' => $directEscrow?->phase?->value,
+            'stage' => $directEscrow?->stage?->value,
+            'status_label' => $directEscrow?->status?->label(),
+            'phase_label' => $directEscrow?->phase?->label(),
+            'stage_label' => $directEscrow?->stage?->label(),
+
+            // Signatures
             'buyer_signature_url' => $this->when(
                 $this->buyer_signature_path,
                 asset('storage/' . $this->buyer_signature_path)
@@ -43,6 +46,8 @@ class EscrowResource extends JsonResource
                 $this->seller_signature_path,
                 asset('storage/' . $this->seller_signature_path)
             ),
+
+            // Payment info
             'payment_receipts_urls' => $this->when(
                 $this->payment_receipts,
                 collect($this->payment_receipts)->map(static fn(string $path) => asset('storage/' . $path))->toArray()
@@ -56,6 +61,16 @@ class EscrowResource extends JsonResource
             'amount_received_method_label' => $this->amount_received_method?->label(),
             'amount_released_method_label' => $this->amount_released_method?->label(),
             'amount_refunded_method_label' => $this->amount_refunded_method?->label(),
+
+            // Dispute info
+            'dispute_reason' => $directEscrow?->dispute_reason?->value,
+            'dispute_reason_label' => $directEscrow?->dispute_reason?->label(),
+            'dispute_details' => $directEscrow?->dispute_details,
+            'dispute_resolution' => $directEscrow?->dispute_resolution?->value,
+            'dispute_resolution_label' => $directEscrow?->dispute_resolution?->label(),
+            'dispute_resolution_note' => $directEscrow?->dispute_resolution_note,
+
+            // Common fields
             'cancellation_note' => $this->cancellation_note,
             'refund_reason' => $this->refund_reason,
             'has_unread_messages' => $this->hasUnreadMessages(),
@@ -64,32 +79,17 @@ class EscrowResource extends JsonResource
         ];
     }
 
-    private function getSelectedSlot(): ?TimeSlotResource
-    {
-        return $this->whenLoaded('timeSlots', function (): ?TimeSlotResource {
-            return $this->adminEscrow?->phase?->value >= EscrowPhase::DELIVERY->value ?
-                TimeSlotResource::make($this->timeSlots->first()) :
-                null;
-        }, null);
-    }
-
     private function hasUnreadMessages(): bool
     {
-        if (!$this->relationLoaded('buyerChat') || !$this->relationLoaded('sellerChat')) {
+        if (!$this->relationLoaded('directChat')) {
             return false;
         }
 
         $user = auth()->user() ?? auth('admin-api')->user();
         $senderId = $user?->id;
 
-        $buyerUnread = $this->buyerChat &&
-            $this->buyerChat->relationLoaded('messages') &&
-            $this->buyerChat->messages->where('read_at', null)->where('sender_id', '!=', $senderId)->count() > 0;
-
-        $sellerUnread = $this->sellerChat &&
-            $this->sellerChat->relationLoaded('messages') &&
-            $this->sellerChat->messages->where('read_at', null)->where('sender_id', '!=', $senderId)->count() > 0;
-
-        return $buyerUnread || $sellerUnread;
+        return $this->directChat &&
+            $this->directChat->relationLoaded('messages') &&
+            $this->directChat->messages->where('read_at', null)->where('sender_id', '!=', $senderId)->count() > 0;
     }
 }

@@ -29,9 +29,11 @@ Broadcast::channel('escrow.chat.{type}.{escrowUuid}', static function ($user, $t
 
     $isBuyer = $user instanceof User && $type === ChatType::ESCROW_BUYER->value && $user->id === $escrow->buyer_id;
     $isSeller = $user instanceof User && $type === ChatType::ESCROW_SELLER->value && $user->id === $escrow->seller_id;
+    $isDirectEscrow = $user instanceof User && $type === ChatType::DIRECT_ESCROW->value &&
+                     ($user->id === $escrow->buyer_id || $user->id === $escrow->seller_id);
     $isAdmin = $user instanceof Admin && $user->id === $escrow->admin_id;
 
-    if (!$isBuyer && !$isSeller && !$isAdmin) {
+    if (!$isBuyer && !$isSeller && !$isDirectEscrow && !$isAdmin) {
         return false;
     }
 

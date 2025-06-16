@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\Escrow\EscrowPhase;
-use App\Enums\Escrow\EscrowStage;
-use App\Enums\Escrow\EscrowStatus;
+use App\Enums\Escrow\EscrowType;
 use App\Enums\Escrow\PaymentMethod;
 use App\Enums\Messenger\ChatType;
 use App\Traits\Helpers\EscrowFilter;
@@ -24,8 +22,7 @@ class Escrow extends Model
         'buyer_id',
         'seller_id',
         'admin_id',
-        'phase',
-        'stage',
+        'type',
         'buyer_signature_path',
         'seller_signature_path',
         'payment_receipts',
@@ -37,13 +34,10 @@ class Escrow extends Model
         'amount_refunded_method',
         'cancellation_note',
         'refund_reason',
-        'status',
     ];
 
     protected $casts = [
-        'phase' => EscrowPhase::class,
-        'stage' => EscrowStage::class,
-        'status' => EscrowStatus::class,
+        'type' => EscrowType::class,
         'amount_received_method' => PaymentMethod::class,
         'amount_released_method' => PaymentMethod::class,
         'amount_refunded_method' => PaymentMethod::class,
@@ -100,5 +94,39 @@ class Escrow extends Model
     public function sellerChat(): HasOne
     {
         return $this->hasOne(Chat::class, 'escrow_id')->where('type', ChatType::ESCROW_SELLER);
+    }
+
+    public function directChat(): HasOne
+    {
+        return $this->hasOne(Chat::class, 'escrow_id')->where('type', ChatType::DIRECT_ESCROW);
+    }
+
+    public function adminEscrow(): HasOne
+    {
+        return $this->hasOne(AdminEscrow::class);
+    }
+
+    public function directEscrow(): HasOne
+    {
+        return $this->hasOne(DirectEscrow::class);
+    }
+
+    public function escrowDetails(): ?HasOne
+    {
+        return match($this->type) {
+            EscrowType::ADMIN => $this->adminEscrow(),
+            EscrowType::DIRECT => $this->directEscrow(),
+            default => null,
+        };
+    }
+
+    public function isAdminEscrow(): bool
+    {
+        return $this->type === EscrowType::ADMIN;
+    }
+
+    public function isDirectEscrow(): bool
+    {
+        return $this->type === EscrowType::DIRECT;
     }
 }

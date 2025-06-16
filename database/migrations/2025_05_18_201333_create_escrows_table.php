@@ -1,8 +1,5 @@
 <?php
 
-use App\Enums\Escrow\EscrowPhase;
-use App\Enums\Escrow\EscrowStatus;
-use App\Enums\Escrow\EscrowStage;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,8 +18,7 @@ return new class extends Migration
             $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('admin_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->unsignedTinyInteger('phase')->default(EscrowPhase::SIGNATURE->value);
-            $table->unsignedTinyInteger('stage')->default(EscrowStage::AWAITING_SIGNATURE->value);
+            $table->tinyInteger('type')->default(1);
             $table->string('buyer_signature_path')->nullable();
             $table->string('seller_signature_path')->nullable();
             $table->json('payment_receipts')->nullable();
@@ -34,7 +30,6 @@ return new class extends Migration
             $table->unsignedTinyInteger('amount_refunded_method')->nullable();
             $table->text('cancellation_note')->nullable();
             $table->text('refund_reason')->nullable();
-            $table->unsignedTinyInteger('status')->default(EscrowStatus::PENDING->value);
             $table->timestamps();
         });
     }

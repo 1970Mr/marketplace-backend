@@ -5,7 +5,6 @@ namespace App\Traits\Helpers;
 use App\Enums\Escrow\EscrowPhase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 trait EscrowFilter
 {
@@ -62,7 +61,8 @@ trait EscrowFilter
             return $query;
         }
 
-        return $query->where('phase', EscrowPhase::DELIVERY)
-            ->whereHas('timeSlots');
+        return $query->whereHas('adminEscrow', function ($q) {
+            $q->where('phase', EscrowPhase::DELIVERY);
+        })->whereHas('timeSlots');
     }
 }

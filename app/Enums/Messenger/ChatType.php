@@ -11,4 +11,5 @@ enum ChatType: int
     case USER_TO_USER = 1;
     case ESCROW_SELLER = 2;
     case ESCROW_BUYER = 3;
+    case DIRECT_ESCROW = 4;
 }

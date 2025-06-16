@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\Escrow;
+namespace App\Services\DirectEscrow;
 
-use App\Enums\Escrow\EscrowPhase;
-use App\Enums\Escrow\EscrowStage;
+use App\Enums\Escrow\DirectEscrowPhase;
+use App\Enums\Escrow\DirectEscrowStage;
 use App\Models\Escrow;
 use Illuminate\Http\UploadedFile;
 
-class SignatureService
+class DirectEscrowSignatureService
 {
     public function uploadBuyerSignature(Escrow $escrow, UploadedFile $file): Escrow
     {
@@ -16,7 +16,7 @@ class SignatureService
 
         $this->checkSignaturesCompletion($escrow);
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'directEscrow']);
     }
 
     public function uploadSellerSignature(Escrow $escrow, UploadedFile $file): Escrow
@@ -26,23 +26,23 @@ class SignatureService
 
         $this->checkSignaturesCompletion($escrow);
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'directEscrow']);
     }
 
     private function checkSignaturesCompletion(Escrow $escrow): void
     {
         if ($escrow->buyer_signature_path && $escrow->seller_signature_path) {
-            $escrow->adminEscrow->update([
-                'phase' => EscrowPhase::PAYMENT,
-                'stage' => EscrowStage::AWAITING_PAYMENT,
+            $escrow->directEscrow->update([
+                'phase' => DirectEscrowPhase::PAYMENT,
+                'stage' => DirectEscrowStage::AWAITING_PAYMENT,
             ]);
         } elseif ($escrow->buyer_signature_path && !$escrow->seller_signature_path) {
-            $escrow->adminEscrow->update([
-                'stage' => EscrowStage::AWAITING_SELLER_SIGNATURE,
+            $escrow->directEscrow->update([
+                'stage' => DirectEscrowStage::AWAITING_SELLER_SIGNATURE,
             ]);
         } elseif (!$escrow->buyer_signature_path && $escrow->seller_signature_path) {
-            $escrow->adminEscrow->update([
-                'stage' => EscrowStage::AWAITING_BUYER_SIGNATURE,
+            $escrow->directEscrow->update([
+                'stage' => DirectEscrowStage::AWAITING_BUYER_SIGNATURE,
             ]);
         }
     }

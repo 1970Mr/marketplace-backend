@@ -6,11 +6,14 @@ use App\Http\Controllers\Api\V1\Admin\Escrow\EscrowController as AdminEscrowCont
 use App\Http\Controllers\Api\V1\Admin\ProductManagement\ProductManagementController;
 use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Messenger\ChatController as EscrowChatController;
+use App\Http\Controllers\Api\V1\Messenger\MessageController as EscrowMessageController;
+use App\Http\Controllers\Api\V1\Admin\DirectEscrow\DirectEscrowController as AdminDirectEscrowController;
+use App\Http\Controllers\Api\V1\Panel\DirectEscrow\DirectEscrowChatController;
+use App\Http\Controllers\Api\V1\Panel\DirectEscrow\DirectEscrowController as PanelDirectEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Escrow\EscrowController as PanelEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
-use App\Http\Controllers\Api\V1\Messenger\ChatController as EscrowChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
-use App\Http\Controllers\Api\V1\Messenger\MessageController as EscrowMessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
 use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProductController;
 use App\Http\Controllers\Api\V1\Panel\WatchList\WatchListController;
@@ -146,7 +149,7 @@ Route::prefix('v1')->group(function () {
             Route::post('{escrow:uuid}/assign/{admin}', [AdminEscrowController::class, 'assignAgent']);
             Route::post('{escrow:uuid}/payment/confirm', [AdminEscrowController::class, 'confirmPayment']);
             Route::post('{escrow:uuid}/delivery/confirm', [AdminEscrowController::class, 'confirmDelivery']);
-            Route::post('{escrow:uuid}/payout/release', [AdminEscrowController::class, 'releaseFunds']);
+            Route::post('{escrow:uuid}/complete', [AdminEscrowController::class, 'complete']);
             Route::post('{escrow:uuid}/cancel', [AdminEscrowController::class, 'cancel']);
             Route::post('{escrow:uuid}/refund', [AdminEscrowController::class, 'refund']);
         });
@@ -167,9 +170,47 @@ Route::prefix('v1')->group(function () {
         // Messages
         Route::prefix('messages')->group(function () {
             Route::post('/', [EscrowMessageController::class, 'store']);
-            Route::post('/', [EscrowMessageController::class, 'store']);
             Route::patch('/{message:uuid}/read', [EscrowMessageController::class, 'markAsRead']);
             Route::patch('/{chat:uuid}/read-all', [EscrowMessageController::class, 'markAllAsRead']);
+        });
+    });
+
+    // User Routes
+    Route::prefix('panel')->middleware('auth:sanctum')->group(function () {
+        // Direct Escrow Routes
+        Route::prefix('direct-escrows')->group(function () {
+            Route::get('/me', [PanelDirectEscrowController::class, 'getMyDirectEscrows']);
+            Route::get('/{escrow:uuid}', [PanelDirectEscrowController::class, 'show']);
+            Route::post('/', [PanelDirectEscrowController::class, 'store']);
+            Route::post('/{escrow:uuid}/signatures/buyer', [PanelDirectEscrowController::class, 'uploadBuyerSignature']);
+            Route::post('/{escrow:uuid}/signatures/seller', [PanelDirectEscrowController::class, 'uploadSellerSignature']);
+            Route::post('/{escrow:uuid}/receipts', [PanelDirectEscrowController::class, 'uploadReceipts']);
+            Route::post('/{escrow:uuid}/delivery/seller-confirm', [PanelDirectEscrowController::class, 'sellerConfirmDelivery']);
+            Route::post('/{escrow:uuid}/delivery/buyer-accept', [PanelDirectEscrowController::class, 'buyerAcceptDelivery']);
+            Route::post('/{escrow:uuid}/dispute', [PanelDirectEscrowController::class, 'openDispute']);
+
+            // Todo: Delete It
+            // Chat
+            Route::prefix('/{escrow:uuid}/chat')->group(function () {
+                Route::get('/messages', [DirectEscrowChatController::class, 'getMessages']);
+                Route::post('/messages', [DirectEscrowChatController::class, 'sendMessage']);
+            });
+        });
+    });
+
+    // Admin Routes
+    Route::prefix('admin')->middleware('auth:admin-api')->group(function () {
+        // Direct Escrow Routes
+        Route::prefix('direct-escrows')->group(function () {
+            Route::get('/', [AdminDirectEscrowController::class, 'index']);
+            Route::get('/unassigned', [AdminDirectEscrowController::class, 'getUnassignedEscrows']);
+            Route::get('/me', [AdminDirectEscrowController::class, 'getMyEscrows']);
+            Route::get('/{escrow:uuid}', [AdminDirectEscrowController::class, 'show']);
+            Route::post('/{escrow:uuid}/assign/{admin}', [AdminDirectEscrowController::class, 'assignAgent']);
+            Route::post('/{escrow:uuid}/payment/confirm', [AdminDirectEscrowController::class, 'confirmPayment']);
+            Route::post('/{escrow:uuid}/dispute/resolve', [AdminDirectEscrowController::class, 'resolveDispute']);
+            Route::post('/{escrow:uuid}/complete', [AdminDirectEscrowController::class, 'complete']);
+            Route::post('/{escrow:uuid}/refund', [AdminDirectEscrowController::class, 'refund']);
         });
     });
 });

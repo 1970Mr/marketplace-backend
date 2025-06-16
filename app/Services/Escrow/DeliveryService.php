@@ -13,10 +13,11 @@ class DeliveryService
      */
     public function confirmDelivery(Escrow $escrow): Escrow
     {
-        $escrow->phase = EscrowPhase::PAYOUT;
-        $escrow->stage = EscrowStage::AWAITING_PAYOUT;
-        $escrow->save();
+        $escrow->adminEscrow->update([
+            'phase' => EscrowPhase::PAYOUT,
+            'stage' => EscrowStage::AWAITING_PAYOUT,
+        ]);
 
-        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots']);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
     }
 }

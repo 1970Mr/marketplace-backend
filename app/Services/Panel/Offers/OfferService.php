@@ -3,6 +3,7 @@
 namespace App\Services\Panel\Offers;
 
 use App\Enums\Escrow\EscrowStatus;
+use App\Enums\Escrow\EscrowType;
 use App\Enums\Messenger\MessageType;
 use App\Enums\Offers\OfferType;
 use App\Events\ChatParticipantsNotified;
@@ -11,15 +12,19 @@ use App\Models\Chat;
 use App\Models\Offer;
 use App\Models\Products\Product;
 use App\Models\User;
+use App\Services\DirectEscrow\DirectEscrowManagementService;
 use App\Services\Escrow\EscrowManagementService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
-class OfferService
+readonly class OfferService
 {
-    public function __construct(readonly private EscrowManagementService $escrowManagementService)
+    public function __construct(
+        private EscrowManagementService $escrowManagementService,
+        private DirectEscrowManagementService $directEscrowManagementService
+    )
     {
     }
 
@@ -118,13 +123,24 @@ class OfferService
     }
 
     private function handleCreateEscrowWhenAcceptOffer(Offer $offer, int $status): void {
-        if ($status === OfferType::ACCEPTED->value) {
+        if ($status !== OfferType::ACCEPTED->value || $offer->escrow) {
+            return;
+        }
+
+        if ($offer->product->escrow_type === EscrowType::ADMIN) {
             $this->escrowManagementService->createEscrow([
                 'offer_id' => $offer->id,
                 'buyer_id' => $offer->buyer_id,
                 'seller_id' => $offer->seller_id,
             ]);
+            return;
         }
+
+        $this->directEscrowManagementService->createDirectEscrow([
+            'offer_id' => $offer->id,
+            'buyer_id' => $offer->buyer_id,
+            'seller_id' => $offer->seller_id,
+        ]);
     }
 
     private function handleDeleteEscrowWhenRejectOffer(Offer $offer, int $status): void {
