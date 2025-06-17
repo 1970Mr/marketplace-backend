@@ -20,6 +20,8 @@ class DirectEscrowManagementService
         return $user->escrows()
             ->where('type', EscrowType::DIRECT->value)
             ->with(['offer.product', 'buyer', 'seller', 'directEscrow'])
+            ->filterByDateRange($request->get('from_date'), $request->get('to_date'))
+            ->hasUnreadMessages((bool)$request->get('need_response', false))
             ->latest()
             ->paginate($request->get('per_page', 10));
     }

@@ -12,6 +12,10 @@ class UnifiedEscrowService
     {
         return $user->escrows()
             ->with(['offer.product', 'buyer', 'seller', 'admin', 'adminEscrow', 'directEscrow', 'directChat', 'buyerChat', 'sellerChat'])
+            ->filterByProductTitle($request->get('search'))
+            ->filterByRelationColumn('status', $request->get('status'))
+            ->filterByRelationColumn('phase', $request->get('phase'))
+            ->filterByRelationColumn('stage', $request->get('stage'))
             ->latest()
             ->paginate($request->get('per_page', 10));
     }

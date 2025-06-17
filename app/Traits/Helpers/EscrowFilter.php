@@ -65,4 +65,19 @@ trait EscrowFilter
             $q->where('phase', EscrowPhase::DELIVERY);
         })->whereHas('timeSlots');
     }
+
+    public function scopeFilterByRelationColumn(Builder $query, string $column, string|int|null $value): Builder
+    {
+        if (!$value) {
+            return $query;
+        }
+
+        return $query->where(function ($query) use ($column, $value) {
+            $query->whereHas('adminEscrow', function ($q) use ($column, $value) {
+                $q->where($column, $value);
+            })->orWhereHas('directEscrow', function ($q) use ($column, $value) {
+                $q->where($column, $value);
+            });
+        });
+    }
 }
