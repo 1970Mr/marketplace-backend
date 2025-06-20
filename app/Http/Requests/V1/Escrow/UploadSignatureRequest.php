@@ -22,7 +22,7 @@ class UploadSignatureRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required','file'],
+            'file' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
     }
 }

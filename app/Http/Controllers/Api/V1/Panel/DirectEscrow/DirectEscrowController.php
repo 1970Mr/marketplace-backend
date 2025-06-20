@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Panel\DirectEscrow;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\Escrow\UploadSignatureRequest;
 use App\Http\Requests\V1\DirectEscrow\{
     CreateDirectEscrowRequest,
-    DisputeRequest,
-    UploadSignatureRequest
+    DisputeRequest
 };
 use App\Http\Requests\V1\Escrow\UploadReceiptsRequest;
 use App\Http\Resources\V1\DirectEscrow\DirectEscrowResource;

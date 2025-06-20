@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Api\V1\Admin\DirectEscrow;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\DirectEscrow\ResolveDisputeRequest;
-use App\Http\Requests\V1\DirectEscrow\ConfirmPaymentRequest;
+use App\Http\Requests\V1\Escrow\CompleteEscrowRequest;
+use App\Http\Requests\V1\Escrow\ConfirmPaymentRequest;
 use App\Http\Resources\V1\DirectEscrow\DirectEscrowResource;
 use App\Models\Admin;
 use App\Models\Escrow;
 use App\Services\DirectEscrow\DirectEscrowDisputeService;
-use App\Services\DirectEscrow\DirectEscrowPaymentService;
 use App\Services\DirectEscrow\DirectEscrowManagementService;
+use App\Services\DirectEscrow\DirectEscrowPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -19,9 +20,11 @@ class DirectEscrowController extends Controller
 {
     public function __construct(
         readonly private DirectEscrowManagementService $managementService,
-        readonly private DirectEscrowDisputeService $disputeService,
-        readonly private DirectEscrowPaymentService $paymentService
-    ) {}
+        readonly private DirectEscrowDisputeService    $disputeService,
+        readonly private DirectEscrowPaymentService    $paymentService
+    )
+    {
+    }
 
     public function index(Request $request): JsonResponse
     {
@@ -71,9 +74,13 @@ class DirectEscrowController extends Controller
         return DirectEscrowResource::make($escrow)->response();
     }
 
-    public function complete(Escrow $escrow): JsonResponse
+    public function complete(CompleteEscrowRequest $request, Escrow $escrow): JsonResponse
     {
-        $escrow = $this->managementService->completeEscrow($escrow);
+        $escrow = $this->managementService->completeEscrow(
+            $escrow,
+            $request->validated('amount'),
+            $request->validated('method')
+        );
         return DirectEscrowResource::make($escrow)->response();
     }
 

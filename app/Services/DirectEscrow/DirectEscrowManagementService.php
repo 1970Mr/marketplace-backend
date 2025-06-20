@@ -81,11 +81,11 @@ class DirectEscrowManagementService
         return $escrow->load(['offer.product', 'buyer', 'seller', 'directEscrow']);
     }
 
-    public function completeEscrow(Escrow $escrow): Escrow
+    public function completeEscrow(Escrow $escrow, float $amount, int $method): Escrow
     {
         $escrow->update([
-            'amount_released' => $escrow->amount_received,
-            'amount_released_method' => $escrow->amount_received_method,
+            'amount_released' => $amount,
+            'amount_released_method' => $method,
         ]);
 
         $escrow->directEscrow->update([
