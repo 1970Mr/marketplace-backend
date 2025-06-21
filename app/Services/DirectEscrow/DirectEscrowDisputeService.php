@@ -32,6 +32,7 @@ class DirectEscrowDisputeService
 
         $escrow->directEscrow->update([
             'status' => DirectEscrowStatus::RESOLVED,
+            'phase' => DirectEscrowPhase::COMPLETED,
             'stage' => DirectEscrowStage::DISPUTE_RESOLVED,
             'dispute_resolution' => $disputeResolution,
             'dispute_resolution_note' => $note,

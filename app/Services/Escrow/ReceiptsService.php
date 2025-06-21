@@ -25,14 +25,7 @@ class ReceiptsService
             'payment_receipts' => array_merge($escrow->payment_receipts ?? [], $paths)
         ]);
 
-        // Update stage based on escrow type
-        if ($escrow->isDirectEscrow()) {
-            $escrow->directEscrow->update(['stage' => DirectEscrowStage::PAYMENT_UPLOADED]);
-            return $escrow->load(['offer.product', 'buyer', 'seller', 'directEscrow']);
-        } else {
-            $escrow->adminEscrow->update(['stage' => EscrowStage::PAYMENT_UPLOADED]);
-            return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
-        }
+        return $this->updateStage($escrow);
     }
 
     private function checkReceiptsLimit(Escrow $escrow): void
@@ -42,5 +35,16 @@ class ReceiptsService
                 'number_limit' => 'Payment receipts limit exceeded!'
             ]);
         }
+    }
+
+    public function updateStage(Escrow $escrow): Escrow
+    {
+        if ($escrow->isDirectEscrow()) {
+            $escrow->directEscrow->update(['stage' => DirectEscrowStage::PAYMENT_UPLOADED]);
+            return $escrow->load(['offer.product', 'buyer', 'seller', 'directEscrow']);
+        }
+
+        $escrow->adminEscrow->update(['stage' => EscrowStage::PAYMENT_UPLOADED]);
+        return $escrow->load(['offer.product', 'buyer', 'seller', 'admin', 'timeSlots', 'adminEscrow']);
     }
 }

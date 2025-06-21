@@ -20,8 +20,8 @@ class DirectEscrowController extends Controller
 {
     public function __construct(
         readonly private DirectEscrowManagementService $managementService,
-        readonly private DirectEscrowDisputeService    $disputeService,
-        readonly private DirectEscrowPaymentService    $paymentService
+        readonly private DirectEscrowDisputeService $disputeService,
+        readonly private DirectEscrowPaymentService $paymentService
     )
     {
     }
