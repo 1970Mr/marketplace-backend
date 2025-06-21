@@ -38,9 +38,21 @@ Broadcast::channel('escrow.chat.{type}.{escrowUuid}', static function ($user, $t
     }
 
     $role = $isAdmin ? 'admin' : 'user';
+    $type = '';
+
+    if ($isAdmin) {
+        $type = 'admin';
+    } elseif ($isBuyer || ($isDirectEscrow && $user->id === $escrow->buyer_id)) {
+        $type = 'buyer';
+    } elseif ($isSeller || ($isDirectEscrow && $user->id === $escrow->seller_id)) {
+        $type = 'seller';
+    }
+
     return [
         'id' => "{$role}:{$user->id}",
-        'type' => $role,
+        'role' => $role,
+        'type' => $type,
         'name' => $user->name,
+        'actual_id' => $user->id
     ];
 });

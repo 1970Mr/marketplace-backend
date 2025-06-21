@@ -32,7 +32,7 @@ class MessageService
 
         $chat->messages()->save($message);
 
-        broadcast(new EscrowMessageSent($message, $chat->type))->toOthers();
+        broadcast(new EscrowMessageSent($message, $chat->type));
 
         return $message;
     }

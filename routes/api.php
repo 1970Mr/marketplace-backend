@@ -9,7 +9,6 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Messenger\ChatController as EscrowChatController;
 use App\Http\Controllers\Api\V1\Messenger\MessageController as EscrowMessageController;
 use App\Http\Controllers\Api\V1\Admin\DirectEscrow\DirectEscrowController as AdminDirectEscrowController;
-use App\Http\Controllers\Api\V1\Panel\DirectEscrow\DirectEscrowChatController;
 use App\Http\Controllers\Api\V1\Panel\DirectEscrow\DirectEscrowController as PanelDirectEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Escrow\EscrowController as PanelEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
@@ -188,13 +187,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/{escrow:uuid}/delivery/seller-confirm', [PanelDirectEscrowController::class, 'sellerConfirmDelivery']);
             Route::post('/{escrow:uuid}/delivery/buyer-accept', [PanelDirectEscrowController::class, 'buyerAcceptDelivery']);
             Route::post('/{escrow:uuid}/dispute', [PanelDirectEscrowController::class, 'openDispute']);
-
-            // Todo: Delete It
-            // Chat
-            Route::prefix('/{escrow:uuid}/chat')->group(function () {
-                Route::get('/messages', [DirectEscrowChatController::class, 'getMessages']);
-                Route::post('/messages', [DirectEscrowChatController::class, 'sendMessage']);
-            });
         });
     });
 
