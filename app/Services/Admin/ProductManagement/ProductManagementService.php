@@ -11,52 +11,46 @@ class ProductManagementService
 {
     public function getFilteredProducts(array $filters): LengthAwarePaginator
     {
-        // Base query with eager loading, include soft deleted products
+        logger($filters);
         $query = Product::query()->with(['user', 'productable'])->withTrashed();
 
-        // Apply search
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
         if (!empty($filters['search'])) {
             $query->where(function (Builder $q) use ($filters) {
-                $q->where('industry', 'like', "%{$filters['search']}%")
+                $q->where('title', 'like', "%{$filters['search']}%")
                     ->orWhereHas('user', function (Builder $q) use ($filters) {
                         $q->where('name', 'like', "%{$filters['search']}%");
                     });
             });
         }
 
-        // Apply date range filter
-        if (!empty($filters['date_from'])) {
-            $query->whereDate('created_at', '>=', $filters['date_from']);
+        if (isset($filters['only_trashed'])) {
+            $query->onlyTrashed();
         }
 
-        if (!empty($filters['date_to'])) {
-            $query->whereDate('created_at', '<=', $filters['date_to']);
+        if (!empty($filters['from_date'])) {
+            $query->whereDate('created_at', '>=', $filters['from_date']);
         }
 
-        // Apply category filter
-        if (!empty($filters['category'])) {
-            $query->where('type', $filters['category']);
+        if (!empty($filters['to_date'])) {
+            $query->whereDate('created_at', '<=', $filters['to_date']);
         }
 
-        // Apply status filter
-        if (isset($filters['status']) && $filters['status'] !== 'all') {
-            if ($filters['status'] === 'deleted') {
-                $query->onlyTrashed();
-            } else {
-                $query->where('status', $filters['status']);
-            }
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
         }
 
-        // Apply price range filter
-        if (!empty($filters['price_min'])) {
-            $query->where('price', '>=', $filters['price_min']);
+        if (!empty($filters['min_price'])) {
+            $query->where('price', '>=', $filters['min_price']);
         }
 
-        if (!empty($filters['price_max'])) {
-            $query->where('price', '<=', $filters['price_max']);
+        if (!empty($filters['max_price'])) {
+            $query->where('price', '<=', $filters['max_price']);
         }
 
-        // Apply Pagination
         $page = $filters['page'] ?? 1;
         $perPage = $filters['per_page'] ?? 10;
 

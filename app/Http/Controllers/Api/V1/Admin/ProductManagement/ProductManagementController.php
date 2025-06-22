@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1\Admin\ProductManagement;
 
 use App\Enums\Products\ProductStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\Admin\ProductManagement\ProductFilterRequest;
 use App\Http\Resources\V1\Products\ProductResource;
 use App\Models\Products\Product;
 use App\Services\Admin\ProductManagement\ProductManagementService;
@@ -20,10 +19,9 @@ class ProductManagementController extends Controller
     {
     }
 
-    public function index(ProductFilterRequest $request): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $filters = $request->validated();
-        $products = $this->productService->getFilteredProducts($filters);
+        $products = $this->productService->getFilteredProducts($request->all());
         return ProductResource::collection($products);
     }
 

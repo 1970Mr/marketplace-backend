@@ -40,6 +40,7 @@ class ProductResource extends JsonResource
             'is_sponsored' => $this->is_sponsored,
             'escrow_type' => $this->escrow_type->label(),
             'status' => $this->status->label(),
+            'created_at' => $this->created_at,
             'is_in_watchlist' => $this->when($this->relationLoaded('watchers'), fn() => $this->isInWatchList()),
             'user' => UserResource::make($this->whenLoaded('user')),
         ];

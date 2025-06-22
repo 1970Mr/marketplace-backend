@@ -24,8 +24,8 @@ class UserFilterRequest extends FormRequest
     {
         return [
             'search'        => 'nullable|string|max:255',
-            'date_from'     => 'nullable|date',
-            'date_to'       => 'nullable|date|after_or_equal:from',
+            'from_date'     => 'nullable|date',
+            'to_date'       => 'nullable|date|after_or_equal:from',
             'country'       => 'nullable|string|max:255',
             'status'        => 'nullable|in:' . implode(',', array_column(UserStatus::cases(), 'value')),
             'escrow_min'    => 'nullable|integer|min:0',

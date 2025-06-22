@@ -135,9 +135,9 @@ Route::prefix('v1')->group(function () {
         // Product Management
         Route::prefix('product-management')->group(function () {
             Route::get('/', [ProductManagementController::class, 'index']);
-            Route::get('/{product_id}', [ProductManagementController::class, 'show']);
-            Route::patch('/{product_id}/status', [ProductManagementController::class, 'updateStatus']);
-            Route::delete('/{product}', [ProductManagementController::class, 'destroy']);
+            Route::get('/{product:uuid}', [ProductManagementController::class, 'show']);
+            Route::patch('/{product:uuid}/status', [ProductManagementController::class, 'updateStatus']);
+            Route::delete('/{product:uuid}', [ProductManagementController::class, 'destroy']);
         });
 
         // Escrow (Admin)
