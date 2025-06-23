@@ -136,7 +136,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('product-management')->group(function () {
             Route::get('/', [ProductManagementController::class, 'index']);
             Route::get('/{product:uuid}', [ProductManagementController::class, 'show']);
-            Route::patch('/{product:uuid}/status', [ProductManagementController::class, 'updateStatus']);
+            Route::patch('/{product:uuid}/status', [ProductManagementController::class, 'changeStatus']);
             Route::delete('/{product:uuid}', [ProductManagementController::class, 'destroy']);
         });
 

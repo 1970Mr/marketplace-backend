@@ -15,7 +15,9 @@ class SecondSocialAccountResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'url' => $this->url,
             'followers_count' => $this->followers_count,
+            'posts_count' => $this->posts_count,
             'business_age' => $this->business_age,
             'business_location' => $this->business_locations[0],
             'featured_image' => $this->getFeaturedImage(),

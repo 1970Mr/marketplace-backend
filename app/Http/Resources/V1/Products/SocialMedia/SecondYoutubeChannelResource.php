@@ -15,8 +15,11 @@ class SecondYoutubeChannelResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'url' => $this->url,
             'subscribers_count' => $this->subscribers_count,
             'monthly_revenue' => $this->monthly_revenue,
+            'monthly_views' => $this->monthly_views,
+            'monetization_method' => $this->monetization_method,
             'business_age' => $this->business_age,
             'business_location' => $this->business_locations[0],
             'featured_image' => $this->getFeaturedImage(),

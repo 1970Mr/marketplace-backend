@@ -11,7 +11,6 @@ class ProductManagementService
 {
     public function getFilteredProducts(array $filters): LengthAwarePaginator
     {
-        logger($filters);
         $query = Product::query()->with(['user', 'productable'])->withTrashed();
 
         if (!empty($filters['status'])) {
@@ -54,34 +53,20 @@ class ProductManagementService
         $page = $filters['page'] ?? 1;
         $perPage = $filters['per_page'] ?? 10;
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        return $query->latest()->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function getProductDetails($product_id): array
+    public function getProductDetails(Product $product): array
     {
-        $product = Product::withTrashed()
-            ->with(['user', 'productable'])
-            ->findOrFail($product_id);
-
-
-        // Get count of active products for the same user
         $productsCount = Product::where('user_id', $product->user_id)
             ->whereNull('deleted_at')
             ->count();
 
-        // Prepare response data
         return [
-            'product' => new ProductResource($product),
-            'total_listings' => $productsCount,
+            'data' => new ProductResource($product->load(['user', 'productable'])),
+            'meta' => [
+                'total_listings' => $productsCount,
+            ]
         ];
-    }
-
-    public function updateProductStatus($product_id, $status): ProductResource
-    {
-        $product = Product::findOrFail($product_id);
-
-        $product->update(['status' => $status]);
-
-        return new ProductResource($product);
     }
 }
