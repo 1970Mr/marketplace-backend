@@ -128,7 +128,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [UserManagementController::class, 'index']);
             Route::get('/{user}', [UserManagementController::class, 'show']);
             Route::patch('/{user}/note', [UserManagementController::class, 'updateNote']);
-            Route::patch('/{user}/status', [UserManagementController::class, 'updateStatus']);
+            Route::patch('/{user}/status', [UserManagementController::class, 'changeStatus']);
             Route::get('/{user}/chats', [UserManagementController::class, 'userChats']);
         });
 

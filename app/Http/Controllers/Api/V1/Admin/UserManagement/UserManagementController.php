@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin\UserManagement;
 
 use App\Enums\Users\UserStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\Admin\UserManagement\UserFilterRequest;
+use App\Http\Requests\V1\Admin\UserManagement\ChangeUserStatusRequest;
 use App\Http\Resources\V1\Users\UserResource;
 use App\Models\User;
 use App\Services\Admin\UserManagement\UserManagementService;
@@ -16,19 +16,17 @@ class UserManagementController extends Controller
 {
     public function __construct(readonly private UserManagementService $userService) {}
 
-    public function index(UserFilterRequest $request): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $filters = $request->validated();
-
-        $users = $this->userService->getFilteredUsers($filters);
-
+        $users = $this->userService->getFilteredUsers($request->all());
         return UserResource::collection($users);
     }
 
-    // View Single User Details
     public function show(User $user): UserResource
     {
-        return new UserResource($user);
+        return new UserResource(
+            $user->loadCount(['products', 'escrowsAsBuyer', 'escrowsAsSeller'])
+        );
     }
 
     // Add or Update User Note
@@ -49,21 +47,10 @@ class UserManagementController extends Controller
         ]);
     }
 
-    // Update User Status
-    public function updateStatus(Request $request, User $user): JsonResponse
+    public function changeStatus(ChangeUserStatusRequest $request, User $user): JsonResponse
     {
-        // Validate the status
-        $validated = $request->validate([
-            'status' => 'required|integer|in:' . implode(',', array_column(UserStatus::cases(), 'value'))
-        ]);
-
-        // Update the status
-        $user->update(['status' => $validated['status']]);
-
-        return response()->json([
-            'message' => 'User status updated successfully!',
-            'user' => new UserResource($user)
-        ]);
+        $user->update(['status' => $request->get('status')]);
+        return UserResource::make($user->loadCount(['products', 'escrows']))->response();
     }
 
     // Get User Chats

@@ -25,6 +25,9 @@ class UserResource extends JsonResource
             'note' => $this->note,
             'last_activity_at' => $this->last_activity_at?->diffForHumans(),
             'status' => $this->status->label(),
+            'status_label' => $this->status->label(),
+            'products_count' => $this->whenCounted('products'),
+            'escrows_count' => $this->getEscrowsCount(),
             'type' => 'user',
             'created_at' => $this->created_at,
         ];
@@ -33,5 +36,13 @@ class UserResource extends JsonResource
     private function getAvatarUrl(): ?string
     {
         return $this->avatar ? asset('storage/' . $this->avatar) : null;
+    }
+
+    private function getEscrowsCount(): ?int
+    {
+        if (!$this->escrows_as_buyer_count && !$this->escrows_as_seller_count) {
+            return null;
+        }
+        return ($this->escrows_as_buyer_count ?? 0) + ($this->escrows_as_seller_count ?? 0);
     }
 }

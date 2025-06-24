@@ -8,7 +8,6 @@ use App\Models\Products\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -76,21 +75,28 @@ class User extends Authenticatable
         return $this->hasMany(Chat::class, 'buyer_id')->orWhere('seller_id', $this->id);
     }
 
-//    public function messages(): HasManyThrough
-//    {
-//        return $this->hasManyThrough(Message::class, Chat::class, 'buyer_id', 'chat_id')
-//            ->orWhereHas('chats', function ($query) {
-//                $query->where('seller_id', $this->id);
-//            });
-//    }
-
     public function messages(): MorphMany
     {
         return $this->morphMany(Message::class, 'sender');
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function escrows(): HasMany
     {
         return $this->hasMany(Escrow::class, 'buyer_id')->orWhere('seller_id', $this->id);
+    }
+
+    public function escrowsAsBuyer(): HasMany
+    {
+        return $this->hasMany(Escrow::class, 'buyer_id');
+    }
+
+    public function escrowsAsSeller(): HasMany
+    {
+        return $this->hasMany(Escrow::class, 'seller_id');
     }
 }
