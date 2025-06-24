@@ -2,8 +2,11 @@
 
 namespace App\Http\Resources\V1\Users;
 
+use App\Http\Resources\V1\Escrow\UnifiedEscrowResource;
+use App\Http\Resources\V1\Products\ProductResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 
 class UserResource extends JsonResource
 {
@@ -24,10 +27,12 @@ class UserResource extends JsonResource
             'country' => $this->country,
             'note' => $this->note,
             'last_activity_at' => $this->last_activity_at?->diffForHumans(),
-            'status' => $this->status->label(),
+            'status' => $this->status->value,
             'status_label' => $this->status->label(),
             'products_count' => $this->whenCounted('products'),
             'escrows_count' => $this->getEscrowsCount(),
+            'products' => ProductResource::make($this->whenLoaded('products')),
+            'escrows' => UnifiedEscrowResource::collection($this->getAllEscrows()),
             'type' => 'user',
             'created_at' => $this->created_at,
         ];
@@ -44,5 +49,20 @@ class UserResource extends JsonResource
             return null;
         }
         return ($this->escrows_as_buyer_count ?? 0) + ($this->escrows_as_seller_count ?? 0);
+    }
+
+    private function getAllEscrows(): Collection
+    {
+        $allEscrows = collect();
+
+        if ($this->relationLoaded('escrowsAsBuyer')) {
+            $allEscrows = $allEscrows->merge($this->escrowsAsBuyer);
+        }
+
+        if ($this->relationLoaded('escrowsAsSeller')) {
+            $allEscrows = $allEscrows->merge($this->escrowsAsSeller);
+        }
+
+        return $allEscrows;
     }
 }

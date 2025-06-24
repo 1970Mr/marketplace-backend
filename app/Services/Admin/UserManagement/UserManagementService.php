@@ -13,7 +13,6 @@ class UserManagementService
     {
         $query = User::withCount(['products', 'escrowsAsBuyer', 'escrowsAsSeller']);
 
-        // Apply search
         if (!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', "%{$filters['search']}%")
@@ -22,7 +21,6 @@ class UserManagementService
             });
         }
 
-        // Apply filters
         if (!empty($filters['from_date'])) {
             $query->whereDate('created_at', '>=', $filters['from_date']);
         }
@@ -35,21 +33,15 @@ class UserManagementService
             $query->where('status', $filters['status']);
         }
 
-        // Filter by products_count
         if (!empty($filters['products_count'])) {
             $this->applyCountRangeFilter($query, 'products_count', $filters['products_count']);
         }
 
-        // Filter by escrows_count
         if (!empty($filters['escrows_count'])) {
             $this->applyCountRangeFilter($query, '(escrows_as_buyer_count + escrows_as_seller_count)', $filters['escrows_count']);
         }
 
-        // Apply Pagination
-        $page = $filters['page'] ?? 1;
-        $perPage = $filters['per_page'] ?? 10;
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        return $query->latest()->paginate($filters['per_page'] ?? 10);
     }
 
     public function getUserChats(User $user): Collection
@@ -59,11 +51,12 @@ class UserManagementService
             ->with([
                 'buyer:id,name,email',
                 'seller:id,name,email',
+                'admin:id,name,email',
                 'messages' => function ($query) {
-                    $query->orderBy('created_at', 'desc');
+                    $query->latest();
                 }
             ])
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->get();
     }
 
@@ -83,5 +76,22 @@ class UserManagementService
                 $query->havingRaw("{$column} > 10");
                 break;
         }
+    }
+
+    public function getUserWithRelations(User $user): User
+    {
+        $relations = [
+            'adminEscrow',
+            'directEscrow',
+            'offer.product',
+            'buyer',
+            'seller'
+        ];
+
+        return $user->load([
+            'escrowsAsBuyer' => fn($q) => $q->with($relations),
+            'escrowsAsSeller' => fn($q) => $q->with($relations)
+        ])
+            ->loadCount(['products', 'escrowsAsBuyer', 'escrowsAsSeller']);
     }
 }

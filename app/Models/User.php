@@ -85,9 +85,10 @@ class User extends Authenticatable
         return $this->hasMany(Product::class);
     }
 
-    public function escrows(): HasMany
+    public function escrows()
     {
-        return $this->hasMany(Escrow::class, 'buyer_id')->orWhere('seller_id', $this->id);
+        return Escrow::where('buyer_id', $this->id)
+            ->orWhere('seller_id', $this->id);
     }
 
     public function escrowsAsBuyer(): HasMany

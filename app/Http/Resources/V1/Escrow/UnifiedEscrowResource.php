@@ -17,8 +17,8 @@ class UnifiedEscrowResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $escrowDetails = $this->escrowDetails;
         $isDirectEscrow = $this->isDirectEscrow();
+        $escrowDetails = $isDirectEscrow ? $this->directEscrow : $this->adminEscrow;
 
         return [
             'uuid' => $this->uuid,

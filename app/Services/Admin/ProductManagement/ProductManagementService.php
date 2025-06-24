@@ -50,10 +50,7 @@ class ProductManagementService
             $query->where('price', '<=', $filters['max_price']);
         }
 
-        $page = $filters['page'] ?? 1;
-        $perPage = $filters['per_page'] ?? 10;
-
-        return $query->latest()->paginate($perPage, ['*'], 'page', $page);
+        return $query->latest()->paginate($filters['per_page'] ?? 10);
     }
 
     public function getProductDetails(Product $product): array
