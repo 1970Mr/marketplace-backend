@@ -58,7 +58,7 @@ class AgentController extends Controller
 
     public function toggleStatus(ToggleAgentStatusRequest $request, Admin $admin): JsonResponse
     {
-        $statusLabel = $this->agentService->toggleStatus($admin, $request->input('status'));
-        return response()->json(['status' => $statusLabel]);
+        $admin = $this->agentService->toggleStatus($admin, $request->input('status'));
+        return AdminResource::make($admin)->response();
     }
 }

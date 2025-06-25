@@ -45,7 +45,7 @@ class UserManagementController extends Controller
 
     public function userChats(User $user): JsonResponse
     {
-        return ChatResource::make(
+        return ChatResource::collection(
             $this->userService->getUserChats($user)
         )->response();
     }

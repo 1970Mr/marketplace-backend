@@ -68,9 +68,9 @@ class AgentService
         return $admin->getPermissionNames()->toArray();
     }
 
-    public function toggleStatus(Admin $admin, int $status): string
+    public function toggleStatus(Admin $admin, int $status): Admin
     {
         $admin->update(['status' => $status]);
-        return $admin->status->label();
+        return $admin;
     }
 }

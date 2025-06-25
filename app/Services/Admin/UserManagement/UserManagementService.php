@@ -52,9 +52,8 @@ class UserManagementService
                 'buyer:id,name,email',
                 'seller:id,name,email',
                 'admin:id,name,email',
-                'messages' => function ($query) {
-                    $query->latest();
-                }
+                'product:title',
+                'messages'
             ])
             ->latest()
             ->get();
