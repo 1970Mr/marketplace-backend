@@ -2,13 +2,14 @@
 
 use App\Http\Controllers\Api\V1\Admin\Agents\AgentController;
 use App\Http\Controllers\Api\V1\Admin\Auth\AuthController as AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\DirectEscrow\DirectEscrowController as AdminDirectEscrowController;
 use App\Http\Controllers\Api\V1\Admin\Escrow\EscrowController as AdminEscrowController;
 use App\Http\Controllers\Api\V1\Admin\ProductManagement\ProductManagementController;
 use App\Http\Controllers\Api\V1\Admin\UserManagement\UserManagementController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Messenger\ChatController as EscrowChatController;
 use App\Http\Controllers\Api\V1\Messenger\MessageController as EscrowMessageController;
-use App\Http\Controllers\Api\V1\Admin\DirectEscrow\DirectEscrowController as AdminDirectEscrowController;
+use App\Http\Controllers\Api\V1\Panel\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\Panel\DirectEscrow\DirectEscrowController as PanelDirectEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Escrow\EscrowController as PanelEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
@@ -56,6 +57,9 @@ Route::prefix('v1')->group(function () {
 
     // Panel
     Route::prefix('panel')->middleware('auth:sanctum')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+
         // Offers
         Route::prefix('offers')->group(function () {
             Route::get('/seller', [OfferController::class, 'sellerOffers']);

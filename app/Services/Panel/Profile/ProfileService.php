@@ -17,18 +17,15 @@ class ProfileService
         $user->company_name = $data['company_name'] ?? $user->company_name;
         $user->phone_number = $data['phone_number'] ?? $user->phone_number;
 
-        // Handle avatar removal
         if (!empty($data['remove_avatar'])) {
             $this->removeAvatar($user);
         }
 
-        // Handle avatar upload if a file is provided
         if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
             $this->uploadAvatar($user, $data['avatar']);
         }
 
         $user->save();
-
         return $user;
     }
 
@@ -66,12 +63,8 @@ class ProfileService
 
     private function uploadAvatar(User $user, UploadedFile $file): void
     {
-        // Remove old avatar if it exists
         $this->removeAvatar($user);
-
-        // Store the new avatar using Laravel Storage
         $path = $file->store('profile/avatars', 'public');
-
         $user->avatar = $path;
     }
 }

@@ -111,13 +111,9 @@ class Escrow extends Model
         return $this->hasOne(DirectEscrow::class);
     }
 
-    public function escrowDetails(): ?HasOne
+    public function escrowDetails(): DirectEscrow|AdminEscrow
     {
-        return match($this->type) {
-            EscrowType::ADMIN => $this->adminEscrow(),
-            EscrowType::DIRECT => $this->directEscrow(),
-            default => null,
-        };
+        return $this->isDirectEscrow() ? $this->directEscrow : $this->adminEscrow;
     }
 
     public function isAdminEscrow(): bool
