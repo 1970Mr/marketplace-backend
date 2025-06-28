@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
 use App\Http\Controllers\Api\V1\Panel\Products\ProductController as PanelProductController;
+use App\Http\Controllers\Api\V1\Panel\Profile\ProfileController;
+use App\Http\Controllers\Api\V1\Panel\Profile\TwoFactorAuthController;
 use App\Http\Controllers\Api\V1\Panel\WatchList\WatchListController;
 use App\Http\Controllers\Api\V1\Products\ProductController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\InstagramAccountController;
@@ -28,6 +30,14 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
+    Route::get('/user', [AuthController::class, 'getUser'])->middleware('auth:sanctum');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->middleware('throttle:5,1');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::get('/email/verify', [AuthController::class, 'verifyEmail'])->middleware('auth:sanctum')
+        ->name('verification.verify');
+    Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])
+        ->middleware(['auth:sanctum', 'throttle:5,1']);
+    Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 
     // Products
     Route::prefix('products')->group(function () {
@@ -101,6 +111,34 @@ Route::prefix('v1')->group(function () {
             Route::post('{escrow:uuid}/slots/select', [PanelEscrowController::class, 'selectSlot']);
             Route::post('{escrow:uuid}/slots/reject', [PanelEscrowController::class, 'rejectScheduling']);
         });
+
+        // Direct Escrow (User)
+        Route::prefix('direct-escrows')->group(function () {
+            Route::get('/me', [PanelDirectEscrowController::class, 'getMyDirectEscrows']);
+            Route::get('/{escrow:uuid}', [PanelDirectEscrowController::class, 'show']);
+            Route::post('/', [PanelDirectEscrowController::class, 'store']);
+            Route::post('/{escrow:uuid}/signatures/buyer', [PanelDirectEscrowController::class, 'uploadBuyerSignature']);
+            Route::post('/{escrow:uuid}/signatures/seller', [PanelDirectEscrowController::class, 'uploadSellerSignature']);
+            Route::post('/{escrow:uuid}/receipts', [PanelDirectEscrowController::class, 'uploadReceipts']);
+            Route::post('/{escrow:uuid}/delivery/seller-confirm', [PanelDirectEscrowController::class, 'sellerConfirmDelivery']);
+            Route::post('/{escrow:uuid}/delivery/buyer-accept', [PanelDirectEscrowController::class, 'buyerAcceptDelivery']);
+            Route::post('/{escrow:uuid}/dispute', [PanelDirectEscrowController::class, 'openDispute']);
+        });
+
+        Route::prefix('profile')->middleware('auth:sanctum')->group(function () {
+            // User Profile
+            Route::get('/', [ProfileController::class, 'show']);
+            Route::put('/', [ProfileController::class, 'update']);
+            Route::patch('/email', [ProfileController::class, 'changeEmail'])->middleware('throttle:3,1');
+            Route::patch('/password', [ProfileController::class, 'changePassword'])->middleware('throttle:3,1');
+
+            // Two-Factor Authentication
+            Route::post('/two-factor/enable', [TwoFactorAuthController::class, 'enableTwoFactor']);
+            Route::delete('/two-factor/disable', [TwoFactorAuthController::class, 'disableTwoFactor']);
+            Route::get('/two-factor/qrcode', [TwoFactorAuthController::class, 'getTwoFactorQrCode']);
+            Route::post('/two-factor/verify', [TwoFactorAuthController::class, 'verifyTwoFactor']);
+            Route::get('/two-factor/recovery-codes', [TwoFactorAuthController::class, 'getRecoveryCodes']);
+        });
     });
 
     // Admin Auth
@@ -152,6 +190,19 @@ Route::prefix('v1')->group(function () {
             Route::post('{escrow:uuid}/cancel', [AdminEscrowController::class, 'cancel']);
             Route::post('{escrow:uuid}/refund', [AdminEscrowController::class, 'refund']);
         });
+
+        // Direct Escrow (Admin)
+        Route::prefix('direct-escrows')->group(function () {
+            Route::get('/', [AdminDirectEscrowController::class, 'index']);
+            Route::get('/unassigned', [AdminDirectEscrowController::class, 'getUnassignedEscrows']);
+            Route::get('/me', [AdminDirectEscrowController::class, 'getMyEscrows']);
+            Route::get('/{escrow:uuid}', [AdminDirectEscrowController::class, 'show']);
+            Route::post('/{escrow:uuid}/assign/{admin}', [AdminDirectEscrowController::class, 'assignAgent']);
+            Route::post('/{escrow:uuid}/payment/confirm', [AdminDirectEscrowController::class, 'confirmPayment']);
+            Route::post('/{escrow:uuid}/dispute/resolve', [AdminDirectEscrowController::class, 'resolveDispute']);
+            Route::post('/{escrow:uuid}/complete', [AdminDirectEscrowController::class, 'complete']);
+            Route::post('/{escrow:uuid}/refund', [AdminDirectEscrowController::class, 'refund']);
+        });
     });
 
     // Escrow Messenger
@@ -171,38 +222,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [EscrowMessageController::class, 'store']);
             Route::patch('/{message:uuid}/read', [EscrowMessageController::class, 'markAsRead']);
             Route::patch('/{chat:uuid}/read-all', [EscrowMessageController::class, 'markAllAsRead']);
-        });
-    });
-
-    // User Routes
-    Route::prefix('panel')->middleware('auth:sanctum')->group(function () {
-        // Direct Escrow Routes
-        Route::prefix('direct-escrows')->group(function () {
-            Route::get('/me', [PanelDirectEscrowController::class, 'getMyDirectEscrows']);
-            Route::get('/{escrow:uuid}', [PanelDirectEscrowController::class, 'show']);
-            Route::post('/', [PanelDirectEscrowController::class, 'store']);
-            Route::post('/{escrow:uuid}/signatures/buyer', [PanelDirectEscrowController::class, 'uploadBuyerSignature']);
-            Route::post('/{escrow:uuid}/signatures/seller', [PanelDirectEscrowController::class, 'uploadSellerSignature']);
-            Route::post('/{escrow:uuid}/receipts', [PanelDirectEscrowController::class, 'uploadReceipts']);
-            Route::post('/{escrow:uuid}/delivery/seller-confirm', [PanelDirectEscrowController::class, 'sellerConfirmDelivery']);
-            Route::post('/{escrow:uuid}/delivery/buyer-accept', [PanelDirectEscrowController::class, 'buyerAcceptDelivery']);
-            Route::post('/{escrow:uuid}/dispute', [PanelDirectEscrowController::class, 'openDispute']);
-        });
-    });
-
-    // Admin Routes
-    Route::prefix('admin')->middleware('auth:admin-api')->group(function () {
-        // Direct Escrow Routes
-        Route::prefix('direct-escrows')->group(function () {
-            Route::get('/', [AdminDirectEscrowController::class, 'index']);
-            Route::get('/unassigned', [AdminDirectEscrowController::class, 'getUnassignedEscrows']);
-            Route::get('/me', [AdminDirectEscrowController::class, 'getMyEscrows']);
-            Route::get('/{escrow:uuid}', [AdminDirectEscrowController::class, 'show']);
-            Route::post('/{escrow:uuid}/assign/{admin}', [AdminDirectEscrowController::class, 'assignAgent']);
-            Route::post('/{escrow:uuid}/payment/confirm', [AdminDirectEscrowController::class, 'confirmPayment']);
-            Route::post('/{escrow:uuid}/dispute/resolve', [AdminDirectEscrowController::class, 'resolveDispute']);
-            Route::post('/{escrow:uuid}/complete', [AdminDirectEscrowController::class, 'complete']);
-            Route::post('/{escrow:uuid}/refund', [AdminDirectEscrowController::class, 'refund']);
         });
     });
 });

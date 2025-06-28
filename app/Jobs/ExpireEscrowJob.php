@@ -28,7 +28,7 @@ class ExpireEscrowJob implements ShouldQueue
     {
         $escrow = $this->escrow->fresh();
 
-        if ($escrow && $escrow->phase->value <= EscrowPhase::PAYMENT->value) {
+        if ($escrow && $escrow->phase?->value <= EscrowPhase::PAYMENT->value) {
             $escrow->update([
                 'status' => EscrowStatus::EXPIRED,
             ]);

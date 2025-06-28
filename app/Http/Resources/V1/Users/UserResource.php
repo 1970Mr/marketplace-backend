@@ -24,7 +24,7 @@ class UserResource extends JsonResource
             'phone_number' => $this->phone_number,
             'avatar' => $this->getAvatarUrl(),
             'company_name' => $this->company_name,
-            'country' => $this->country,
+            'country_name' => $this->country_name,
             'note' => $this->note,
             'last_activity_at' => $this->last_activity_at?->diffForHumans(),
             'status' => $this->status?->value,

@@ -17,7 +17,7 @@ class UserManagementService
             $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', "%{$filters['search']}%")
                     ->orWhere('email', 'like', "%{$filters['search']}%")
-                    ->orWhere('country', 'like', "%{$filters['country']}%");
+                    ->orWhere('country_name', 'like', "%{$filters['country_name']}%");
             });
         }
 

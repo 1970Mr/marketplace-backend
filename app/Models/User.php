@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Users\UserStatus;
 use App\Models\Products\Product;
+use App\Notifications\PasswordResetNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
@@ -28,8 +30,8 @@ class User extends Authenticatable
         'email',
         'phone_number',
         'avatar',
+        'country_name',
         'company_name',
-        'country',
         'email_verified_at',
         'phone_verified_at',
         'password',
@@ -62,6 +64,11 @@ class User extends Authenticatable
             'last_activity_at' => 'datetime',
             'status' => UserStatus::class,
         ];
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new PasswordResetNotification($token, $this->email));
     }
 
     public function watchlist(): BelongsToMany
@@ -99,5 +106,10 @@ class User extends Authenticatable
     public function escrowsAsSeller(): HasMany
     {
         return $this->hasMany(Escrow::class, 'seller_id');
+    }
+
+    public function twoFactorToken(): HasOne
+    {
+        return $this->hasOne(TwoFactorToken::class);
     }
 }

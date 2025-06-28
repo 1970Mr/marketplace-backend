@@ -27,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             TrackUserActivity::class,
         ]);
+
+        $middleware->alias([
+            'verified.api' => App\Http\Middleware\EnsureEmailIsVerifiedForApi::class
+        ]);
     })
     ->withSchedule(function (Schedule $schedule) {
         $schedule->job(new CleanOldTimeSlots)->dailyAt('02:00');
