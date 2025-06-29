@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\Agents\AgentController;
 use App\Http\Controllers\Api\V1\Admin\Auth\AuthController as AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Api\V1\Admin\DirectEscrow\DirectEscrowController as AdminDirectEscrowController;
 use App\Http\Controllers\Api\V1\Admin\Escrow\EscrowController as AdminEscrowController;
 use App\Http\Controllers\Api\V1\Admin\ProductManagement\ProductManagementController;
@@ -154,6 +155,9 @@ Route::prefix('v1')->group(function () {
 
     // Admin
     Route::prefix('admin')->middleware(['auth:admin-api'])->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+
         // Agents
         Route::prefix('agents')->group(function () {
             Route::get('/', [AgentController::class, 'index']);

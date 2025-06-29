@@ -158,9 +158,6 @@ readonly class DashboardService
 
     private function checkEscrowUnreadMessages(Escrow $escrow, User $user): bool
     {
-        // Get the appropriate chat based on user role and escrow type
-        $chat = null;
-
         if ($escrow->isDirectEscrow()) {
             $chat = $escrow->directChat;
         } else {
@@ -171,7 +168,6 @@ readonly class DashboardService
             return false;
         }
 
-        // Check if there are unread messages in this chat
         return Message::where('chat_id', $chat->id)
             ->where('sender_id', '!=', $user->id)
             ->whereNull('read_at')
