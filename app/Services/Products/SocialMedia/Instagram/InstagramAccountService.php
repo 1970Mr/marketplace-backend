@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Products\SocialMedia;
+namespace App\Services\Products\SocialMedia\Instagram;
 
 use App\Models\Products\InstagramAccount;
 use App\Models\Products\Product;

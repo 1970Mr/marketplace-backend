@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Messenger\MessageController as EscrowMessageCont
 use App\Http\Controllers\Api\V1\Panel\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\Panel\DirectEscrow\DirectEscrowController as PanelDirectEscrowController;
 use App\Http\Controllers\Api\V1\Panel\Escrow\EscrowController as PanelEscrowController;
+use App\Http\Controllers\Api\V1\Auth\YoutubeAuthController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\ChatController;
 use App\Http\Controllers\Api\V1\Panel\Messenger\MessageController;
 use App\Http\Controllers\Api\V1\Panel\Offers\OfferController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Api\V1\Products\ProductController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\InstagramAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\TiktokAccountController;
 use App\Http\Controllers\Api\V1\Products\SocialMedia\YoutubeChannelController;
+use App\Http\Controllers\Api\V1\Products\Website\DomainController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -50,9 +52,12 @@ Route::prefix('v1')->group(function () {
         // Special products
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/youtube-channel', [YoutubeChannelController::class, 'store']);
+            Route::post('/youtube-channel/verify', [YoutubeChannelController::class, 'verify']);
             Route::post('/instagram-account', [InstagramAccountController::class, 'store']);
+            Route::post('/instagram-account/{product:uuid}/verify', [InstagramAccountController::class, 'verify']);
             Route::post('/tiktok-account', [TiktokAccountController::class, 'store']);
             Route::post('/tiktok-account/{product:uuid}/verify', [TiktokAccountController::class, 'verify']);
+            Route::post('/domain/{product:uuid}/verify', [DomainController::class, 'verify']);
         });
     });
 
@@ -232,4 +237,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{chat:uuid}/read-all', [EscrowMessageController::class, 'markAllAsRead']);
         });
     });
+
+    Route::get('/auth/google', [YoutubeAuthController::class, 'redirectToGoogle'])->middleware('auth:sanctum');
+    Route::get('/auth/google/callback', [YoutubeAuthController::class, 'handleGoogleCallback'])->middleware('auth:sanctum');
 });

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Products\SocialMedia;
+namespace App\Services\Products\SocialMedia\Tiktok;
 
 use App\Models\Products\Product;
 use App\Models\Products\TiktokAccount;

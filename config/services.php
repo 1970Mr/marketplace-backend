@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect'      => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'instagram' => [
+        'graphql_url' => 'https://www.instagram.com/graphql/query',
+        'search_doc_id' => '29271788265799575',
+        'profile_doc_id' => '9718997071514355',
+        'token_pool_size' => 10,
+    ],
+
+    'proxies' => [
+        'residential' => env('PROXY_RESIDENTIAL_URL'),
+    ],
+
+    'admin_notification_email' => env('ADMIN_EMAIL'),
 ];

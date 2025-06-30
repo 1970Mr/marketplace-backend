@@ -112,4 +112,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(TwoFactorToken::class);
     }
+
+    public function oauthProviders(): HasMany
+    {
+        return $this->hasMany(OauthProvider::class);
+    }
+
+    public function oauthProvider(string $provider): ?OauthProvider
+    {
+        return $this->oauthProviders()->where('provider', $provider)->first();
+    }
 }
