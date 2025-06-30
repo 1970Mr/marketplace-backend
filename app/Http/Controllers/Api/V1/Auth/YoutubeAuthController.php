@@ -8,6 +8,8 @@ use Google\Client;
 use Google\Service\YouTube;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class YoutubeAuthController extends Controller
 {
@@ -18,9 +20,9 @@ class YoutubeAuthController extends Controller
      */
     public function redirectToGoogle() : JsonResponse
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
 
-        $client = $this->createGoogleClient();
+        $client = self::createGoogleClient();
         $client->setScopes([
             'openid',
             'https://www.googleapis.com/auth/youtube.readonly'
@@ -42,38 +44,28 @@ class YoutubeAuthController extends Controller
      * Handle Google OAuth callback and verify the user account.
      *
      * @param Request $request The incoming HTTP request.
-     * @return JsonResponse The account verification result.
+     * @return RedirectResponse Redirect to frontend with result.
      */
-    public function handleGoogleCallback(Request $request): JsonResponse
+    public function handleGoogleCallback(Request $request): RedirectResponse
     {
         try {
-            $client = $this->createGoogleClient();
+            $client = self::createGoogleClient();
 
             $accessToken = $client->fetchAccessTokenWithAuthCode($request->code);
 
             #1 check the access token
             if (isset($accessToken['error'])) {
-                throw new OAuthException(
-                    message: $accessToken['error_description'] ?? 'Google authentication failed',
-                    errorCode: 'reauth_required',
-                    code: 401
+                return redirect()->to(
+                    config('app.frontend_url') . '/products/social-media-account/youtube/oauth-callback?status=error&message=' .
+                    urlencode($accessToken['error_description'] ?? 'Google authentication failed')
                 );
             }
 
             #2 check the state parameter
             if (!$request->filled('state')) {
-                throw new OAuthException(
-                    message: 'Missing state parameter.',
-                    errorCode: 'missing_state',
-                    code: 400
-                );
-            }
-
-            if ($request->state != auth()->id()) {
-                throw new OAuthException(
-                    message: 'Invalid state parameter.',
-                    errorCode: 'invalid_state',
-                    code: 400
+                return redirect()->to(
+                    config('app.frontend_url') . '/products/social-media-account/youtube/oauth-callback?status=error&message=' .
+                    urlencode('Missing state parameter')
                 );
             }
 
@@ -86,15 +78,24 @@ class YoutubeAuthController extends Controller
             $missingScopes = array_diff($requiredScopes, $grantedScopes);
 
             if (!empty($missingScopes)) {
-                throw new OAuthException(
-                    message: 'Missing required scopes: ' . implode(', ', $missingScopes),
-                    errorCode: 'missing_scopes',
-                    code: 400
+                return redirect()->to(
+                    config('app.frontend_url') . '/products/social-media-account/youtube/oauth-callback?status=error&message=' .
+                    urlencode('Missing required scopes: ' . implode(', ', $missingScopes))
                 );
             }
 
-            #4 store access token
-            $user = auth()->user();
+            #4 Find user by state parameter
+            $userId = $request->state;
+            $user = \App\Models\User::find($userId);
+
+            if (!$user) {
+                return redirect()->to(
+                    config('app.frontend_url') . '/products/social-media-account/youtube/oauth-callback?status=error&message=' .
+                    urlencode('Invalid user state')
+                );
+            }
+
+            #5 store access token
             $user->oauthProviders()->updateOrCreate(
                 ['provider' => 'google'],
                 [
@@ -104,32 +105,35 @@ class YoutubeAuthController extends Controller
                 ]
             );
 
-            #5 get associated Youtube channels
+            #6 get associated Youtube channels
             $client->setAccessToken($accessToken);
             $youtube = new YouTube($client);
             $channels = $youtube->channels->listChannels('snippet', ['mine' => true]);
 
-            #6 return the result
-            $channels_list = array_map(function ($channel) {
+            #7 return success redirect
+            $channelsList = array_map(function ($channel) {
                 return [
                     'id' => $channel->getId(),
                     'title' => $channel->getSnippet()->getTitle() ?? null
                 ];
             }, $channels->getItems());
 
-            return response()->json([
-                'message' => __('Account linked successfully'),
-                'data' => $channels_list
-            ]);
+            return redirect()->to(
+                config('app.frontend_url') . '/products/social-media-account/youtube/oauth-callback?status=success&message=' .
+                urlencode('Account linked successfully') . '&channels=' .
+                urlencode(json_encode($channelsList))
+            );
 
         } catch (OAuthException $e) {
-            return $e->render();
+            return redirect()->to(
+                config('app.frontend_url') . '/products/social-media-account/youtube/oauth-callback?status=error&message=' .
+                urlencode($e->getMessage())
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'google_oauth_failed',
-                'message' => 'failed to link to account ' . $e->getMessage(),
-                'redirect_url' => isset($client) ? $client->createAuthUrl() : null
-            ], 400);
+            return redirect()->to(
+                config('app.frontend_url') . '/products/social-media-account/youtube/oauth-callback?status=error&message=' .
+                urlencode('OAuth failed: ' . $e->getMessage())
+            );
         }
     }
 

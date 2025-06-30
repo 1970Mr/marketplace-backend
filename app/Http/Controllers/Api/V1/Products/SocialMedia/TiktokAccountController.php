@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Products\SocialMedia\TiktokAccountRequest;
 use App\Http\Resources\V1\Products\SocialMedia\TiktokAccountResource;
 use App\Models\Products\Product;
+use App\Services\Products\SocialMedia\Tiktok\TiktokAccountService;
 use App\Services\Products\SocialMedia\Tiktok\TiktokVerificationService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,9 +15,11 @@ use Illuminate\Validation\ValidationException;
 class TiktokAccountController extends Controller
 {
     public function __construct(
-        readonly private \App\Services\Products\SocialMedia\Tiktok\TiktokAccountService $service,
-        readonly private TiktokVerificationService                                      $verificationService
-    ) {}
+        readonly private TiktokAccountService $service,
+        readonly private TiktokVerificationService $verificationService
+    )
+    {
+    }
 
     public function store(TiktokAccountRequest $request): TiktokAccountResource
     {
@@ -34,30 +37,28 @@ class TiktokAccountController extends Controller
     public function verify(Product $product): JsonResponse
     {
         try {
-            // Implementing bio receiving operations...
             $url = $product->productable->url;
             $result = $this->verificationService->verify($url, $product->uuid);
-            return response()->json([
-                'message' => $result['contains_uuid'] ? __('Account verified successfully') :  __('Account not verified'),
-                'data' => $result
-            ]);
 
-            $bio = 'Example bio';
+            // If verification was successful, update the product
+            if ($result['contains_uuid']) {
+                $product->update(['is_verified' => true]);
 
-            if (!str_contains($bio, $product->uuid)) {
-                throw ValidationException::withMessages([
-                    'verification' => __('UUID not found in account bio')
+                return response()->json([
+                    'success' => true,
+                    'contains_uuid' => true,
+                    'message' => 'TikTok account verified successfully!',
+                    'data' => $result
                 ]);
             }
 
-            $product->update([
-                'is_verified' => true
+            return response()->json([
+                'success' => false,
+                'contains_uuid' => false,
+                'message' => 'Verification code not found in bio. Please make sure you have added the UUID to your TikTok bio.',
+                'data' => $result
             ]);
 
-            return response()->json([
-                'message' => __('Account verified successfully'),
-                'data' => new TiktokAccountResource($product->productable)
-            ]);
         } catch (Exception $e) {
             throw ValidationException::withMessages([
                 'verification' => $e->getMessage()

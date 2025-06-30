@@ -12,7 +12,7 @@ readonly class ProductService
 {
     public function getFilteredProducts(Request $request): LengthAwarePaginator
     {
-        $query = Product::published()
+        $query = Product::where('is_completed', true)
             ->whereUserId(Auth::id());
 
         $this->applySearch($query, $request);
@@ -49,6 +49,7 @@ readonly class ProductService
 
     public function deleteProduct(Product $product): void
     {
+        $product->canDelete();
         abort_if($product->user_id !== Auth::id(), 401);
         $product->delete();
     }

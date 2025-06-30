@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 class InstagramAccountController extends Controller
 {
     public function __construct(
-        readonly private InstagramAccountService      $service,
+        readonly private InstagramAccountService $service,
         readonly private InstagramVerificationService $verificationService
     ) {}
 
@@ -36,15 +36,36 @@ class InstagramAccountController extends Controller
     {
         try {
             $url = $product->productable->url;
-            $uuid = $product->productable->uuid;
+            $uuid = $product->uuid;
 
             $path = parse_url($url, PHP_URL_PATH);
             $username = Str::of($path)->after('/')->before('/')->before('?');
             $username = $username->isNotEmpty() ? $username : null;
 
-            $profile = $this->verificationService->verifyAccount($username, $uuid);
+            if (!$username) {
+                throw new \Exception('Invalid Instagram URL. Could not extract username.');
+            }
 
-            return response()->json($profile);
+            $result = $this->verificationService->verifyAccount($username, $uuid);
+
+            // If verification was successful, update the product
+            if ($result['contains_uuid']) {
+                $product->update(['is_verified' => true]);
+
+                return response()->json([
+                    'success' => true,
+                    'contains_uuid' => true,
+                    'message' => 'Instagram account verified successfully!',
+                    'profile' => $result['profile'] ?? null
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'contains_uuid' => false,
+                'message' => 'Verification code not found in bio. Please make sure you have added the UUID to your Instagram bio.',
+                'profile' => $result['profile'] ?? null
+            ]);
 
         } catch (\Exception $e) {
             throw ValidationException::withMessages([

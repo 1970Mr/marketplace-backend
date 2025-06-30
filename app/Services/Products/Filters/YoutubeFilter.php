@@ -8,5 +8,5 @@ class YoutubeFilter extends SocialMediaFilter
 {
     protected string $platformType = 'youtube';
     protected string $countField = 'subscribers_count';
-    protected string $subscriberCountField = 'subscribers_count';
+    protected string $subscriberCountColumn = 'subscribers_count';
 }

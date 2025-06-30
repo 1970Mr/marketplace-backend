@@ -4,13 +4,16 @@ namespace App\Models\Products;
 
 use App\Enums\Escrow\EscrowType;
 use App\Enums\Products\ProductStatus;
+use App\Models\Offer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 
 class Product extends Model
 {
@@ -61,6 +64,11 @@ class Product extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function offer(): HasOne
+    {
+        return $this->hasOne(Offer::class);
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', ProductStatus::APPROVED->value)
@@ -72,6 +80,15 @@ class Product extends Model
     public function scopeDraft(Builder $query): Builder
     {
         return $query->where('is_completed', false);
+    }
+
+    public function canDelete(): void
+    {
+        if ($this->is_sold || $this->offer) {
+            throw ValidationException::withMessages([
+                'product' => 'Can\'t delete this product'
+            ]);
+        }
     }
 
     public function watchers(): BelongsToMany

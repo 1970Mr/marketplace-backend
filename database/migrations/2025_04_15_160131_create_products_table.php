@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('sub_industry')->nullable();
             $table->boolean('allow_buyer_message')->default(true);
             $table->boolean('is_private')->default(false);
-            $table->boolean('is_verified')->default(true);
+            $table->boolean('is_verified')->default(false);
             $table->boolean('is_sold')->default(false);
             $table->boolean('is_completed')->default(false);
             $table->boolean('is_sponsored')->default(false);

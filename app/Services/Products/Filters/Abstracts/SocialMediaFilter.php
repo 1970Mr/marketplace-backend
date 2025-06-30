@@ -13,7 +13,7 @@ abstract class SocialMediaFilter implements PlatformFilter
 
     protected string $platformType;
     protected string $countField;
-    protected string $subscriberCountField;
+    protected string $subscriberCountColumn;
 
     public function apply(Builder $query, Request $request): void
     {
@@ -29,7 +29,7 @@ abstract class SocialMediaFilter implements PlatformFilter
             $request,
             "min_{$this->countField}",
             "max_{$this->countField}",
-            $this->subscriberCountField,
+            $this->subscriberCountColumn,
             'productable'
         );
     }

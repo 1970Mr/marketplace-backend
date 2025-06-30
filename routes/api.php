@@ -52,7 +52,8 @@ Route::prefix('v1')->group(function () {
         // Special products
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/youtube-channel', [YoutubeChannelController::class, 'store']);
-            Route::post('/youtube-channel/verify', [YoutubeChannelController::class, 'verify']);
+            Route::post('/youtube-channel/{product:uuid}/verify', [YoutubeChannelController::class, 'verify']);
+            Route::get('/youtube-channel/my-channels', [YoutubeChannelController::class, 'getUserChannels']);
             Route::post('/instagram-account', [InstagramAccountController::class, 'store']);
             Route::post('/instagram-account/{product:uuid}/verify', [InstagramAccountController::class, 'verify']);
             Route::post('/tiktok-account', [TiktokAccountController::class, 'store']);
@@ -238,6 +239,6 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::get('/auth/google', [YoutubeAuthController::class, 'redirectToGoogle'])->middleware('auth:sanctum');
-    Route::get('/auth/google/callback', [YoutubeAuthController::class, 'handleGoogleCallback'])->middleware('auth:sanctum');
+    Route::get('/auth/google', [YoutubeAuthController::class, 'redirectToGoogle']);
+    Route::get('/auth/google/callback', [YoutubeAuthController::class, 'handleGoogleCallback']);
 });

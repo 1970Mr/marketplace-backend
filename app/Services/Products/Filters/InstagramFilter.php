@@ -8,5 +8,5 @@ class InstagramFilter extends SocialMediaFilter
 {
     protected string $platformType = 'instagram';
     protected string $countField = 'followers_count';
-    protected string $subscriberCountField = 'followers_count';
+    protected string $subscriberCountColumn = 'followers_count';
 }
