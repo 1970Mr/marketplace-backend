@@ -14,17 +14,13 @@ use Illuminate\Validation\ValidationException;
 
 class YoutubeVerificationService
 {
-    public function verifyProduct(Product $product): void
+    public function verifyProduct(Product $product): ?string
     {
         $channelUrl = $product->productable->url;
         $result = $this->verifyChannelOwnership($channelUrl);
 
         if (isset($result['redirect_url'])) {
-            throw new OAuthException(
-                message: 'Continue with Google.',
-                errorCode: 'oauth_required',
-                code: 302
-            );
+            return $result['redirect_url'];
         }
 
         if (!isset($result['channel_info'])) {
@@ -34,6 +30,7 @@ class YoutubeVerificationService
         }
 
         $product->update(['is_verified' => true]);
+        return null;
     }
 
     private function verifyChannelOwnership(string $channelUrl): array
@@ -86,19 +83,19 @@ class YoutubeVerificationService
 
     private function refreshTokenIfNeeded(Client $client, $googleProvider): Client
     {
-        $client->setAccessToken($googleProvider->access_token);
+        $client->setAccessToken($googleProvider?->access_token);
 
         if ($client->isAccessTokenExpired()) {
             if (!$googleProvider->refresh_token) {
-                $googleProvider->delete();
-                throw new OAuthException(
-                    message: 'Authentication expired. Reauthorization required.',
-                    errorCode: 'reauth_required',
-                    code: 401
-                );
+                $this->authExpired($googleProvider);
             }
 
             $newToken = $client->fetchAccessTokenWithRefreshToken($googleProvider->refresh_token);
+
+            if (!isset($newToken['access_token'])) {
+                $this->authExpired($googleProvider);
+            }
+
             $googleProvider->update([
                 'access_token' => $newToken['access_token'],
                 'expires_at' => now()->addSeconds($newToken['expires_in']),
@@ -109,6 +106,14 @@ class YoutubeVerificationService
         }
 
         return $client;
+    }
+
+    private function authExpired($googleProvider): void
+    {
+        $googleProvider->delete();
+        throw ValidationException::withMessages([
+            'auth_expired' => 'Authentication expired. Reauthorization required.'
+        ]);
     }
 
     private function checkChannelOwnership(YouTube $youtube, string $channelIdentifier, string $channelUrl): array

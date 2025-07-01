@@ -46,7 +46,7 @@ abstract class BaseSocialMediaRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $url = $this->get('url');
-        $extractedTitle = $url ? SocialMediaHelper::extractTitleFromUrl($url, $this->mediaType) : $url;
+        $extractedTitle = $url ? SocialMediaHelper::extractTitleFromUrl($url, strtolower($this->mediaType)) : null;
 
         $this->merge([
             'uuid' => $this->get('uuid') ?? Str::uuid(),

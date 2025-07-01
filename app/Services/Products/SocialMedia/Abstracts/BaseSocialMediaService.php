@@ -2,7 +2,6 @@
 
 namespace App\Services\Products\SocialMedia\Abstracts;
 
-use App\Enums\Products\ProductStatus;
 use App\Models\Products\Product;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
@@ -30,9 +29,8 @@ abstract class BaseSocialMediaService
         $existingProduct = Product::where('title', $productData['title'])
             ->where('sub_type', $productData['sub_type'])
             ->where('uuid', '!=', $productData['uuid'])
-            ->where('status', ProductStatus::APPROVED->value)
-            ->where('is_completed', true)
             ->where('is_verified', true)
+            ->where('is_sold', false)
             ->exists();
 
         if ($existingProduct) {

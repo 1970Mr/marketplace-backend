@@ -27,7 +27,13 @@ class YoutubeChannelController extends Controller
 
     public function verify(Product $product): JsonResponse
     {
-        $this->verificationService->verifyProduct($product);
-        return response()->json(['message' => 'Channel verified successfully']);
+        $redirectUrl = $this->verificationService->verifyProduct($product);
+        if ($redirectUrl) {
+            return response()->json([
+                'verified' => false,
+                'redirect_url' => $redirectUrl,
+            ]);
+        }
+        return response()->json(['verified' => true]);
     }
 }
