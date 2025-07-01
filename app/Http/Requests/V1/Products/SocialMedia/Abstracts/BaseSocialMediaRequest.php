@@ -3,7 +3,9 @@
 namespace App\Http\Requests\V1\Products\SocialMedia\Abstracts;
 
 use App\Enums\Products\ProductType;
+use App\Services\Products\SocialMedia\Helpers\SocialMediaHelper;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 abstract class BaseSocialMediaRequest extends FormRequest
@@ -43,10 +45,13 @@ abstract class BaseSocialMediaRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $url = $this->get('url');
+        $extractedTitle = $url ? SocialMediaHelper::extractTitleFromUrl($url, $this->mediaType) : $url;
+
         $this->merge([
             'uuid' => $this->get('uuid') ?? Str::uuid(),
-            'user_id' => auth()->id(),
-            'title' => $this->get('url'),
+            'user_id' => Auth::id(),
+            'title' => $extractedTitle ?? $url,
             'type' => ProductType::SOCIAL_MEDIA_ACCOUNT->value,
             'sub_type' => $this->mediaType,
         ]);

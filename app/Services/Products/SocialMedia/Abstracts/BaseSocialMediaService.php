@@ -2,21 +2,44 @@
 
 namespace App\Services\Products\SocialMedia\Abstracts;
 
+use App\Enums\Products\ProductStatus;
 use App\Models\Products\Product;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 
 abstract class BaseSocialMediaService
 {
     protected array $serviceSpecificFields = [];
     protected string $fileStoragePath;
 
-    public function storeOrUpdate(array $data): mixed
+    abstract protected function updateOrCreateMedia(Product $product, array $mediaData);
+
+    public function updateOrCreate(array $data): mixed
     {
         $mediaData = $this->getMediaData($data);
         $productData = $this->getProductData($data, $mediaData);
 
+        $this->checkDuplicateTitle($productData);
+
         $product = Product::updateOrCreate(['uuid' => $productData['uuid']], $productData);
         return $this->updateOrCreateMedia($product, $mediaData);
+    }
+
+    protected function checkDuplicateTitle(array $productData): void
+    {
+        $existingProduct = Product::where('title', $productData['title'])
+            ->where('sub_type', $productData['sub_type'])
+            ->where('uuid', '!=', $productData['uuid'])
+            ->where('status', ProductStatus::APPROVED->value)
+            ->where('is_completed', true)
+            ->where('is_verified', true)
+            ->exists();
+
+        if ($existingProduct) {
+            throw ValidationException::withMessages([
+                'title' => 'This account name is already listed for this platform'
+            ]);
+        }
     }
 
     protected function getMediaData(array $data): array
@@ -58,6 +81,4 @@ abstract class BaseSocialMediaService
     {
         return collect($data)->filter()->toArray();
     }
-
-    abstract protected function updateOrCreateMedia(Product $product, array $mediaData);
 }

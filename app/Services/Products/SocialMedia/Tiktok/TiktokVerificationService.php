@@ -2,12 +2,27 @@
 
 namespace App\Services\Products\SocialMedia\Tiktok;
 
+use App\Models\Products\Product;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 
 class TiktokVerificationService
 {
     protected string $scriptId = '__UNIVERSAL_DATA_FOR_REHYDRATION__';
+
+    public function verifyProduct(Product $product): void
+    {
+        $url = $product->productable->url;
+        $result = $this->verifyAccount($url, $product->uuid);
+
+        if (!$result['contains_uuid']) {
+            throw ValidationException::withMessages([
+                'verification' => 'Verification code not found in bio. Please make sure you have added the UUID to your TikTok bio.'
+            ]);
+        }
+
+        $product->update(['is_verified' => true]);
+    }
 
     /**
      * Verify a TikTok account by checking the presence of a UUID in the profile bio.
@@ -17,7 +32,7 @@ class TiktokVerificationService
      * @return array Verification result
      * @throws ValidationException
      */
-    public function verify(string $profileUrl, string $verificationCode): array
+    protected function verifyAccount(string $profileUrl, string $verificationCode): array
     {
         try {
             $html = $this->fetchProfileHtml($profileUrl);
@@ -96,16 +111,16 @@ class TiktokVerificationService
     protected function mapProfileData(array $userInfo, array $userStats): array
     {
         return [
-            'username'          => $userInfo['uniqueId'] ?? '',
-            'nickname'          => $userInfo['nickname'] ?? '',
-            'biography'         => $userInfo['signature'] ?? '',
-            'follower_count'    => $userStats['followerCount'] ?? 0,
-            'following_count'   => $userStats['followingCount'] ?? 0,
-            'video_count'       => $userStats['videoCount'] ?? 0,
-            'like_count'        => $userStats['heart'] ?? 0,
-            'profile_pic_url'   => $userInfo['avatarMedium'] ?? '',
-            'is_verified'       => $userInfo['verified'] ?? false,
-            'is_private'        => $userInfo['privateAccount'] ?? false,
+            'username' => $userInfo['uniqueId'] ?? '',
+            'nickname' => $userInfo['nickname'] ?? '',
+            'biography' => $userInfo['signature'] ?? '',
+            'follower_count' => $userStats['followerCount'] ?? 0,
+            'following_count' => $userStats['followingCount'] ?? 0,
+            'video_count' => $userStats['videoCount'] ?? 0,
+            'like_count' => $userStats['heart'] ?? 0,
+            'profile_pic_url' => $userInfo['avatarMedium'] ?? '',
+            'is_verified' => $userInfo['verified'] ?? false,
+            'is_private' => $userInfo['privateAccount'] ?? false,
         ];
     }
 }

@@ -53,7 +53,6 @@ Route::prefix('v1')->group(function () {
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/youtube-channel', [YoutubeChannelController::class, 'store']);
             Route::post('/youtube-channel/{product:uuid}/verify', [YoutubeChannelController::class, 'verify']);
-            Route::get('/youtube-channel/my-channels', [YoutubeChannelController::class, 'getUserChannels']);
             Route::post('/instagram-account', [InstagramAccountController::class, 'store']);
             Route::post('/instagram-account/{product:uuid}/verify', [InstagramAccountController::class, 'verify']);
             Route::post('/tiktok-account', [TiktokAccountController::class, 'store']);

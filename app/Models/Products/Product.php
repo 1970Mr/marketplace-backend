@@ -73,6 +73,7 @@ class Product extends Model
     {
         return $query->where('status', ProductStatus::APPROVED->value)
             ->where('is_completed', true)
+            ->where('is_verified', true)
             ->where('is_sold', false)
             ->where('is_private', false);
     }

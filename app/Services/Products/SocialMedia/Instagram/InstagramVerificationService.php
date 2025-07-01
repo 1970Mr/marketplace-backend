@@ -1,13 +1,45 @@
 <?php
+
 namespace App\Services\Products\SocialMedia\Instagram;
 
+use App\Models\Products\Product;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class InstagramVerificationService
 {
-    public function __construct(protected InstagramClient $client) {}
+    public function __construct(protected InstagramClient $client)
+    {
+    }
 
-    public function searchUser(string $username): ?string
+    public function verifyProduct(Product $product): void
+    {
+        $url = $product->productable->url;
+        $uuid = $product->uuid;
+
+        $path = parse_url($url, PHP_URL_PATH);
+        $username = Str::of($path)->after('/')->before('/')->before('?');
+        $username = $username->isNotEmpty() ? $username : null;
+
+        if (!$username) {
+            throw ValidationException::withMessages([
+                'verification' => 'Invalid Instagram URL. Could not extract username.'
+            ]);
+        }
+
+        $result = $this->verifyAccount($username, $uuid);
+
+        if (!$result['contains_uuid']) {
+            throw ValidationException::withMessages([
+                'verification' => 'Verification code not found in bio. Please make sure you have added the UUID to your Instagram bio.'
+            ]);
+        }
+
+        $product->update(['is_verified' => true]);
+    }
+
+    protected function searchUser(string $username): ?string
     {
         $variables = [
             'data' => [
@@ -29,14 +61,14 @@ class InstagramVerificationService
         return null;
     }
 
-    public function getProfile(string $profileId): array
+    protected function getProfile(string $profileId): array
     {
         $variables = ['id' => $profileId, 'render_surface' => 'PROFILE'];
         $result = $this->client->sendRequest(config('services.instagram.profile_doc_id'), $variables);
         return data_get($result, 'data.user', []);
     }
 
-    public function verifyAccount(string $username, string $verificationCode): array
+    protected function verifyAccount(string $username, string $verificationCode): array
     {
         try {
             $profileId = $this->searchUser($username);
