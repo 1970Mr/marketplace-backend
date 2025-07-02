@@ -61,4 +61,9 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(Message::class, 'sender');
     }
+
+    public function getAuthIdentifierForBroadcasting(): string
+    {
+        return "admin:{$this->getKey()}";
+    }
 }

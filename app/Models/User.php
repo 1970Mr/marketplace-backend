@@ -122,4 +122,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->oauthProviders()->where('provider', $provider)->first();
     }
+
+    public function getAuthIdentifierForBroadcasting(): string
+    {
+        return "user:{$this->getKey()}";
+    }
 }
