@@ -14,9 +14,9 @@ use Illuminate\Validation\ValidationException;
 use PragmaRX\Google2FA\Google2FA;
 use Stevebauman\Location\Facades\Location;
 
-class AuthService
+readonly class AuthService
 {
-    public function __construct(private readonly Google2FA $google2fa) {}
+    public function __construct(private Google2FA $google2fa) {}
 
     public function createUser(RegisterRequest $request): User
     {
@@ -57,9 +57,7 @@ class AuthService
     public function sendPasswordResetNotification(string $email): void
     {
         $user = User::where('email', $email)->firstOrFail();
-
         $token = Password::createToken($user);
-
         $user->sendPasswordResetNotification($token);
     }
 
@@ -67,7 +65,7 @@ class AuthService
     {
         $status = Password::reset(
             $params,
-            function ($user, $password) {
+            static function ($user, $password) {
                 $user->forceFill([
                     'password' => Hash::make($password),
                 ])->save();
@@ -84,9 +82,9 @@ class AuthService
         }
     }
 
-    public function verifyEmailHandler(array $params): array
+    public function verifyEmailHandler(array $params, User $authenticatedUser): array
     {
-        if (auth()->id() != $params['id']) {
+        if ($authenticatedUser->id != $params['id']) {
             throw ValidationException::withMessages([
                 'id' => 'Invalid user id.',
             ]);

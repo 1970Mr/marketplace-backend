@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Auth\EmailVerificationRequest;
+use App\Http\Requests\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\V1\Auth\LoginRequest;
 use App\Http\Requests\V1\Auth\PasswordResetRequest;
 use App\Http\Requests\V1\Auth\RegisterRequest;
@@ -38,9 +39,7 @@ class AuthController extends Controller
             ], 202);
         }
 
-        return response()->json([
-            'access_token' => $tokenOrAccessToken,
-        ]);
+        return response()->json(['access_token' => $tokenOrAccessToken,]);
     }
 
     public function logout(Request $request): JsonResponse
@@ -54,39 +53,27 @@ class AuthController extends Controller
         return UserResource::make($request->user())->response();
     }
 
-    public function sendResetLink(Request $request): JsonResponse
+    public function sendResetLink(ForgotPasswordRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
-
         $this->service->sendPasswordResetNotification($request->email);
-
-        return response()->json([
-            'message' => 'Password reset link sent'
-        ]);
+        return response()->json(['message' => 'Password reset link sent']);
     }
 
     public function resetPassword(PasswordResetRequest $request): JsonResponse
     {
         $this->service->resetPassword($request->validated());
-
-        return response()->json([
-            'message' => 'Password reset successfully'
-        ]);
+        return response()->json(['message' => 'Password reset successfully']);
     }
 
     public function verifyEmail(EmailVerificationRequest $request): JsonResponse
     {
-        $response = $this->service->verifyEmailHandler($request->validated());
-
+        $response = $this->service->verifyEmailHandler($request->validated(), $request->user());
         return response()->json($response);
     }
 
     public function resendVerificationEmail(Request $request): JsonResponse
     {
         $response = $this->service->sendVerificationEmailHandler($request);
-
         return response()->json($response);
     }
 
@@ -102,8 +89,6 @@ class AuthController extends Controller
             $request->input('code')
         );
 
-        return response()->json([
-            'access_token' => $accessToken,
-        ]);
+        return response()->json(['access_token' => $accessToken,]);
     }
 }
