@@ -28,7 +28,7 @@ class ProductService
 
     public function getFilteredProducts(Request $request): LengthAwarePaginator
     {
-        $query = Product::published()->with('productable', 'watchers');
+        $query = Product::published()->with(['productable', 'watchers']);
 
         $this->applySearch($query, $request);
         $this->applyAllFilters($query, $request);

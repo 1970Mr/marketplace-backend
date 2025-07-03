@@ -62,6 +62,8 @@ class YoutubeChannelResource extends JsonResource
             'is_sold' => $product->is_sold,
             'is_completed' => $product->is_completed,
             'is_sponsored' => $product->is_sponsored,
+            'escrow_type' => $product->escrow_type?->value,
+            'escrow_type_label' => $product->escrow_type?->label(),
             'status' => $product->status->label(),
         ];
     }

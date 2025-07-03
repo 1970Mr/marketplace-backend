@@ -12,7 +12,8 @@ readonly class ProductService
 {
     public function getFilteredProducts(Request $request): LengthAwarePaginator
     {
-        $query = Product::where('is_completed', true)
+        $query = Product::with('productable')
+            ->where('is_completed', true)
             ->whereUserId(Auth::id());
 
         $this->applySearch($query, $request);
@@ -24,7 +25,8 @@ readonly class ProductService
 
     public function getDraftProducts(Request $request): LengthAwarePaginator
     {
-        $query = Product::draft()
+        $query = Product::with('productable')
+            ->draft()
             ->whereUserId(Auth::id());
 
         $this->applySearch($query, $request);

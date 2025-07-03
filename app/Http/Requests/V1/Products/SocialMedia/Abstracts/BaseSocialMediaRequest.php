@@ -2,11 +2,15 @@
 
 namespace App\Http\Requests\V1\Products\SocialMedia\Abstracts;
 
+use App\Enums\Escrow\EscrowType;
 use App\Enums\Products\ProductType;
+use App\Models\Products\Product;
+use App\Rules\EscrowTypeChangeRule;
 use App\Services\Products\SocialMedia\Helpers\SocialMediaHelper;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 abstract class BaseSocialMediaRequest extends FormRequest
 {
@@ -31,7 +35,10 @@ abstract class BaseSocialMediaRequest extends FormRequest
             'is_verified' => ['boolean'],
             'is_sold' => ['boolean'],
             'is_completed' => ['boolean'],
-            'is_sponsored' => ['boolean'],
+            'escrow_type' => [
+                Rule::enum(EscrowType::class),
+                new EscrowTypeChangeRule()
+            ],
 
             // Common fields
             'url' => ['nullable', 'url'],

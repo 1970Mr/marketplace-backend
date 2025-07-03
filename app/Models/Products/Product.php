@@ -4,6 +4,7 @@ namespace App\Models\Products;
 
 use App\Enums\Escrow\EscrowType;
 use App\Enums\Products\ProductStatus;
+use App\Models\Escrow;
 use App\Models\Offer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -96,5 +97,15 @@ class Product extends Model
     {
         return $this->belongsToMany(User::class, 'product_user_watchlist')
             ->withTimestamps();
+    }
+
+    public function escrow(): ?Escrow
+    {
+        return $this->offer?->escrow;
+    }
+
+    public function hasEscrow(): bool
+    {
+        return $this->escrow() !== null;
     }
 }
