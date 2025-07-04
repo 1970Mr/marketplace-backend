@@ -27,6 +27,7 @@ class UserResource extends JsonResource
             'country_name' => $this->country_name,
             'note' => $this->note,
             'last_activity_at' => $this->last_activity_at?->diffForHumans(),
+            'two_factor_enabled' => $this->two_factor_enabled,
             'status' => $this->status?->value,
             'status_label' => $this->status?->label(),
             'products_count' => $this->whenCounted('products'),

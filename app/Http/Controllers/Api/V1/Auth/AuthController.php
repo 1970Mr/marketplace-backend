@@ -8,6 +8,7 @@ use App\Http\Requests\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\V1\Auth\LoginRequest;
 use App\Http\Requests\V1\Auth\PasswordResetRequest;
 use App\Http\Requests\V1\Auth\RegisterRequest;
+use App\Http\Requests\V1\Auth\VerifyTwoFactorRequest;
 use App\Http\Resources\V1\Users\UserResource;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -77,13 +78,8 @@ class AuthController extends Controller
         return response()->json($response);
     }
 
-    public function verify2FA(Request $request): JsonResponse
+    public function verify2FA(VerifyTwoFactorRequest $request): JsonResponse
     {
-        $request->validate([
-            'code' => 'required|digits:6',
-            'temp_2fa_token' => 'required|string',
-        ]);
-
         $accessToken = $this->service->verify2FACode(
             $request->input('temp_2fa_token'),
             $request->input('code')

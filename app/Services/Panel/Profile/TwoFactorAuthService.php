@@ -3,9 +3,9 @@
 namespace App\Services\Panel\Profile;
 
 use App\Models\User;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Validation\ValidationException;
+use PragmaRX\Google2FA\Google2FA;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TwoFactorAuthService
 {
@@ -66,7 +66,7 @@ class TwoFactorAuthService
         );
 
         // Generate SVG QR Code
-        $svg = (string) QrCode::size(300)->generate($otpUrl);
+        $svg = (string)QrCode::size(300)->generate($otpUrl);
 
         return [
             'passkey' => $secret,
@@ -112,8 +112,11 @@ class TwoFactorAuthService
     private function generateRecoveryCodes(): array
     {
         $codes = [];
-        for ($i = 0; $i < 8; $i++) {
-            $codes[] = strtoupper(bin2hex(random_bytes(5)));
+        for ($i = 0; $i < 10; $i++) {
+            // Generate 8-character codes in format XXXX-XXXX
+            $code = strtoupper(bin2hex(random_bytes(4)));
+            $formatted = substr($code, 0, 4) . '-' . substr($code, 4, 4);
+            $codes[] = $formatted;
         }
         return $codes;
     }

@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Users\UserStatus;
 use App\Models\Products\Product;
 use App\Notifications\PasswordResetNotification;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -126,5 +127,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAuthIdentifierForBroadcasting(): string
     {
         return "user:{$this->getKey()}";
+    }
+
+    public function twoFactorEnabled(): Attribute
+    {
+        return new Attribute(
+            get: fn(): bool => $this->twoFactorToken && $this->twoFactorToken->isConfirmed()
+        );
     }
 }
